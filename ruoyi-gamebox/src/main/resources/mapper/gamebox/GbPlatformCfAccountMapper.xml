@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -93,7 +93,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </delete>
 
     <update id="clearDefault">
-        UPDATE gb_platform_cf_accounts SET is_default = 0 WHERE is_default = 1
+        UPDATE gb_platform_cf_accounts SET is_default = '0' WHERE is_default = '1'
     </update>
 
 </mapper>

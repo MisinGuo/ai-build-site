@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -73,7 +73,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                                    WHEN excl.id IS NULL THEN '1' 
                                    ELSE '0' 
                                END)
-                           ELSE IFNULL(incl.is_visible, '0')
+                           ELSE coalesce(incl.is_visible, '0')
                        END as is_visible,
                        -- 关联来源标识：own(自己的) | default(默认配置) | shared(其他网站分享)
                        CASE 

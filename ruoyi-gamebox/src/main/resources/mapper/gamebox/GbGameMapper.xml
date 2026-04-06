@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -76,7 +76,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 WITH RECURSIVE category_tree AS (
                     SELECT id FROM gb_categories
                     WHERE del_flag = '0'
-                      AND FIND_IN_SET(CAST(id AS CHAR), #{categoryIdsFilter}) > 0
+                      AND POSITION(CAST(id AS CHAR) IN #{categoryIdsFilter}) > 0 > 0
                     UNION ALL
                     SELECT c.id FROM gb_categories c
                     INNER JOIN category_tree ct ON c.parent_id = ct.id
@@ -84,10 +84,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 )
             </if>
             SELECT g.*,
-                   IFNULL(box_cnt.cnt, 0) as box_count,
+                   coalesce(box_cnt.cnt, 0) as box_count,
                      box_cnt.box_ids as box_ids,
-                   IFNULL(site_cnt.incl_cnt, 0) as related_sites_count,
-                   IFNULL(site_cnt.excl_cnt, 0) as excluded_sites_count,
+                   coalesce(site_cnt.incl_cnt, 0) as related_sites_count,
+                   coalesce(site_cnt.excl_cnt, 0) as excluded_sites_count,
                    c.name as category_name,
                    c.icon as category_icon,
                    -- 统一的可见性状态：
@@ -104,7 +104,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                                WHEN excl.id IS NULL THEN '1' 
                                ELSE '0' 
                            END)
-                       ELSE IFNULL(incl.is_visible, '0')
+                       ELSE coalesce(incl.is_visible, '0')
                    END as is_visible,
                    -- 关联来源标识
                    CASE 
@@ -213,7 +213,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                                 ELSE '0'
                             END
                         ) = #{status})
-                        OR (g.site_id != #{siteId} AND g.site_id != #{params.personalSiteId} AND IFNULL(incl.is_visible, '0') = #{status})
+                        OR (g.site_id != #{siteId} AND g.site_id != #{params.personalSiteId} AND coalesce(incl.is_visible, '0') = #{status})
                     )
                 </if>
                 <!-- 按盒子过滤 -->
@@ -221,7 +221,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     AND EXISTS (
                         SELECT 1 FROM gb_box_game_relations bgr
                         WHERE bgr.game_id = g.id
-                          AND FIND_IN_SET(CAST(bgr.box_id AS CHAR), #{boxIdsFilter}) > 0
+                          AND POSITION(CAST(bgr.box_id AS CHAR) IN #{boxIdsFilter}) > 0 > 0
                     )
                 </if>
                 <!-- 按更新时间过滤（时间戳毫秒） -->
@@ -232,7 +232,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     AND g.update_time &lt;= DATE_ADD(FROM_UNIXTIME(#{updateTimeEnd}/1000), INTERVAL 1 DAY)
                 </if>
             </where>
-            ORDER BY IFNULL(box_cnt.cnt, 0) DESC, g.sort_order ASC, g.create_time DESC
+            ORDER BY coalesce(box_cnt.cnt, 0) DESC, g.sort_order ASC, g.create_time DESC
         </if>
         <!-- 创建者模式：查询指定创建者的游戏（默认模式） -->
         <if test="queryMode == null or queryMode != 'related'">
@@ -240,7 +240,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 WITH RECURSIVE category_tree AS (
                     SELECT id FROM gb_categories
                     WHERE del_flag = '0'
-                      AND FIND_IN_SET(CAST(id AS CHAR), #{categoryIdsFilter}) > 0
+                      AND POSITION(CAST(id AS CHAR) IN #{categoryIdsFilter}) > 0 > 0
                     UNION ALL
                     SELECT c.id FROM gb_categories c
                     INNER JOIN category_tree ct ON c.parent_id = ct.id
@@ -248,10 +248,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 )
             </if>
             SELECT g.*,
-                   IFNULL(box_cnt.cnt, 0) as box_count,
+                   coalesce(box_cnt.cnt, 0) as box_count,
                      box_cnt.box_ids as box_ids,
-                   IFNULL(site_cnt.incl_cnt, 0) as related_sites_count,
-                   IFNULL(site_cnt.excl_cnt, 0) as excluded_sites_count,
+                   coalesce(site_cnt.incl_cnt, 0) as related_sites_count,
+                   coalesce(site_cnt.excl_cnt, 0) as excluded_sites_count,
                    c.name as category_name,
                    c.icon as category_icon
             FROM gb_games g
@@ -344,7 +344,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     AND EXISTS (
                         SELECT 1 FROM gb_box_game_relations bgr
                         WHERE bgr.game_id = g.id
-                          AND FIND_IN_SET(CAST(bgr.box_id AS CHAR), #{boxIdsFilter}) > 0
+                          AND POSITION(CAST(bgr.box_id AS CHAR) IN #{boxIdsFilter}) > 0 > 0
                     )
                 </if>
                 <!-- 按更新时间过滤（时间戳毫秒） -->
@@ -355,7 +355,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     AND g.update_time &lt;= DATE_ADD(FROM_UNIXTIME(#{updateTimeEnd}/1000), INTERVAL 1 DAY)
                 </if>
             </where>
-            ORDER BY IFNULL(box_cnt.cnt, 0) DESC, g.sort_order ASC, g.create_time DESC
+            ORDER BY coalesce(box_cnt.cnt, 0) DESC, g.sort_order ASC, g.create_time DESC
         </if>
     </select>
 
@@ -367,7 +367,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 WITH RECURSIVE category_tree AS (
                     SELECT id FROM gb_categories
                     WHERE del_flag = '0'
-                      AND FIND_IN_SET(CAST(id AS CHAR), #{categoryIdsFilter}) > 0
+                      AND POSITION(CAST(id AS CHAR) IN #{categoryIdsFilter}) > 0 > 0
                     UNION ALL
                     SELECT c.id FROM gb_categories c
                     INNER JOIN category_tree ct ON c.parent_id = ct.id
@@ -417,13 +417,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                         OR (g.site_id = #{params.personalSiteId} AND (
                             CASE WHEN incl.id IS NOT NULL THEN incl.is_visible WHEN excl.id IS NULL THEN '1' ELSE '0' END
                         ) = #{status})
-                        OR (g.site_id != #{siteId} AND g.site_id != #{params.personalSiteId} AND IFNULL(incl.is_visible, '0') = #{status})
+                        OR (g.site_id != #{siteId} AND g.site_id != #{params.personalSiteId} AND coalesce(incl.is_visible, '0') = #{status})
                     )
                 </if>
                 <if test="boxIdsFilter != null and boxIdsFilter != ''">
                     AND EXISTS (
                         SELECT 1 FROM gb_box_game_relations bgr
-                        WHERE bgr.game_id = g.id AND FIND_IN_SET(CAST(bgr.box_id AS CHAR), #{boxIdsFilter}) > 0
+                        WHERE bgr.game_id = g.id AND POSITION(CAST(bgr.box_id AS CHAR) IN #{boxIdsFilter}) > 0 > 0
                     )
                 </if>
                 <if test="updateTimeStart != null">AND g.update_time >= FROM_UNIXTIME(#{updateTimeStart}/1000)</if>
@@ -436,7 +436,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 WITH RECURSIVE category_tree AS (
                     SELECT id FROM gb_categories
                     WHERE del_flag = '0'
-                      AND FIND_IN_SET(CAST(id AS CHAR), #{categoryIdsFilter}) > 0
+                      AND POSITION(CAST(id AS CHAR) IN #{categoryIdsFilter}) > 0 > 0
                     UNION ALL
                     SELECT c.id FROM gb_categories c
                     INNER JOIN category_tree ct ON c.parent_id = ct.id
@@ -477,7 +477,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 <if test="boxIdsFilter != null and boxIdsFilter != ''">
                     AND EXISTS (
                         SELECT 1 FROM gb_box_game_relations bgr
-                        WHERE bgr.game_id = g.id AND FIND_IN_SET(CAST(bgr.box_id AS CHAR), #{boxIdsFilter}) > 0
+                        WHERE bgr.game_id = g.id AND POSITION(CAST(bgr.box_id AS CHAR) IN #{boxIdsFilter}) > 0 > 0
                     )
                 </if>
                 <if test="updateTimeStart != null">AND g.update_time >= FROM_UNIXTIME(#{updateTimeStart}/1000)</if>

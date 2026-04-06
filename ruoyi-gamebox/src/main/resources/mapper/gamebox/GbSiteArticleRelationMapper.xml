@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -214,7 +214,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         insert into gb_site_master_article_relations(site_id, master_article_id, relation_type, create_by, create_time)
         values
         <foreach collection="siteIds" item="siteId" separator=",">
-            (#{siteId}, #{articleId}, 'exclude', #{createBy}, sysdate())
+            (#{siteId}, #{articleId}, 'exclude', #{createBy}, now())
         </foreach>
     </insert>
 

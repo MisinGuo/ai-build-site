@@ -108,7 +108,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                                WHEN excl.id IS NULL THEN '1' 
                                ELSE '0' 
                            END)
-                       ELSE IFNULL(incl.is_visible, '0')
+                       ELSE coalesce(incl.is_visible, '0')
                    END as is_visible,
                    -- 关联来源标识
                    CASE 
@@ -180,7 +180,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                                 ELSE '0'
                             END
                         ) = #{status})
-                        OR (m.site_id != #{siteId} AND m.site_id != #{params.personalSiteId} AND IFNULL(incl.is_visible, '0') = #{status})
+                        OR (m.site_id != #{siteId} AND m.site_id != #{params.personalSiteId} AND coalesce(incl.is_visible, '0') = #{status})
                     )
                 </if>
             </where>

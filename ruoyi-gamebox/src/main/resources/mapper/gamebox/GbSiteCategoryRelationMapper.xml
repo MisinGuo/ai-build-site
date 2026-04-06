@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -94,12 +94,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where site_id = #{siteId} and category_id = #{categoryId} and relation_type = 'exclude'
     </select>
 
-    <!-- 查询所有全局分类的关联配置（全局分类 = 个人站 is_personal=1 的分类） -->
+    <!-- 查询所有全局分类的关联配置（全局分类 = 个人站 is_personal = '1' 的分类） -->
     <select id="selectGlobalCategoryRelations" resultMap="GbSiteCategoryRelationResult">
         SELECT r.*, c.name as category_name, c.category_type, s.name as site_name
         FROM gb_site_category_relations r
         INNER JOIN gb_categories c ON r.category_id = c.id
-        INNER JOIN gb_sites ps ON c.site_id = ps.id AND ps.is_personal = 1
+        INNER JOIN gb_sites ps ON c.site_id = ps.id AND ps.is_personal = '1'
         LEFT JOIN gb_sites s ON r.site_id = s.id
         WHERE c.del_flag = '0'
           AND c.status = '1'

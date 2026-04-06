@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -63,9 +63,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                    b.promote_url_2, b.promote_url_3, b.register_download_url, b.discount_rate, 
                    b.features, b.sort_order, b.del_flag, b.create_by, b.create_time, 
                    b.update_by, b.update_time, b.remark, b.category_id,
-                   IFNULL(game_cnt.cnt, 0) as game_count,
-                   IFNULL(site_rel_cnt.incl_cnt, 0) as related_sites_count,
-                   IFNULL(site_rel_cnt.excl_cnt, 0) as excluded_sites_count,
+                   coalesce(game_cnt.cnt, 0) as game_count,
+                   coalesce(site_rel_cnt.incl_cnt, 0) as related_sites_count,
+                   coalesce(site_rel_cnt.excl_cnt, 0) as excluded_sites_count,
                    c.name as category_name,
                    c.icon as category_icon,
                    -- 统一的可见性状态：
@@ -82,7 +82,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                                WHEN excl.id IS NULL THEN '1' 
                                ELSE '0' 
                            END)
-                       ELSE IFNULL(incl.is_visible, '0')
+                       ELSE coalesce(incl.is_visible, '0')
                    END as is_visible,
                    -- 关联来源标识
                    CASE 
@@ -123,7 +123,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                             ELSE '0'
                         END) = '1')
                     OR (g2.site_id != #{siteId} AND g2.site_id != #{params.personalSiteId}
-                        AND gincl2.id IS NOT NULL AND IFNULL(gincl2.is_visible, '0') = '1')
+                        AND gincl2.id IS NOT NULL AND coalesce(gincl2.is_visible, '0') = '1')
                 )
                 GROUP BY r2.box_id
             ) game_cnt ON b.id = game_cnt.box_id
@@ -180,9 +180,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                    b.promote_url_2, b.promote_url_3, b.register_download_url, b.discount_rate, 
                    b.features, b.sort_order, b.status, b.del_flag, b.create_by, b.create_time, 
                    b.update_by, b.update_time, b.remark, b.category_id,
-                   IFNULL(game_cnt_c.cnt, 0) as game_count,
-                   IFNULL(site_rel_cnt_c.incl_cnt, 0) as related_sites_count,
-                   IFNULL(site_rel_cnt_c.excl_cnt, 0) as excluded_sites_count,
+                   coalesce(game_cnt_c.cnt, 0) as game_count,
+                   coalesce(site_rel_cnt_c.incl_cnt, 0) as related_sites_count,
+                   coalesce(site_rel_cnt_c.excl_cnt, 0) as excluded_sites_count,
                    c.name as category_name,
                    c.icon as category_icon
             from gb_game_boxes b

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -262,7 +262,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         set usage_status = '1',
             used_count = used_count + 1,
             used_time = now(),
-            used_article_ids = CONCAT(IFNULL(used_article_ids, ''), IF(used_article_ids IS NULL OR used_article_ids = '', '', ','), #{articleId})
+            used_article_ids = CONCAT(coalesce(used_article_ids, ''), IF(used_article_ids IS NULL OR used_article_ids = '', '', ','), #{articleId})
         where id = #{id}
     </update>
 

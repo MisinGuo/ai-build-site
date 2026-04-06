@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -71,7 +71,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="fieldName != null">#{fieldName},</if>
             <if test="fieldValue != null">#{fieldValue},</if>
             <if test="createBy != null">#{createBy},</if>
-            sysdate()
+            now()
          </trim>
     </insert>
 
@@ -84,7 +84,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="fieldName != null">field_name = #{fieldName},</if>
             <if test="fieldValue != null">field_value = #{fieldValue},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
-            update_time = sysdate()
+            update_time = now()
         </trim>
         where id = #{id}
     </update>

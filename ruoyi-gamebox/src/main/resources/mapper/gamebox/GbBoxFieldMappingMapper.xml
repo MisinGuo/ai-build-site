@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
@@ -116,7 +116,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="conflictStrategy != null">#{conflictStrategy},</if>
             <if test="createBy != null">#{createBy},</if>
             <if test="remark != null">#{remark},</if>
-            sysdate()
+            now()
         </trim>
     </insert>
 
@@ -138,7 +138,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="conflictStrategy != null">conflict_strategy = #{conflictStrategy},</if>
             <if test="updateBy != null">update_by = #{updateBy},</if>
             <if test="remark != null">remark = #{remark},</if>
-            update_time = sysdate()
+            update_time = now()
         </trim>
         where id = #{id}
     </update>
@@ -166,7 +166,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <foreach collection="list" item="item" separator=",">
             (#{item.boxId}, #{item.resourceType}, #{item.sourceField}, #{item.targetField}, #{item.fieldType},
              #{item.targetLocation}, #{item.transformExpression}, #{item.valueMapping}, #{item.defaultValue}, #{item.isRequired},
-             #{item.sortOrder}, #{item.status}, #{item.createBy}, #{item.remark}, sysdate())
+             #{item.sortOrder}, #{item.status}, #{item.createBy}, #{item.remark}, now())
         </foreach>
     </insert>
     
@@ -229,7 +229,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     </if>
                 </foreach>
             </trim>
-            update_time = sysdate()
+            update_time = now()
         </trim>
         where id in
         <foreach collection="list" item="item" open="(" separator="," close=")">

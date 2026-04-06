@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+﻿<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -54,7 +54,7 @@
              usage_count, is_public, sort_order, create_by, create_time)
         VALUES
             (#{templateCode}, #{templateName}, #{description}, #{category}, #{icon}, #{definition},
-             IFNULL(#{usageCount}, 0), IFNULL(#{isPublic}, 1), IFNULL(#{sortOrder}, 0),
+             coalesce(#{usageCount}, 0), coalesce(#{isPublic}, 1), coalesce(#{sortOrder}, 0),
              #{createBy}, NOW())
     </insert>
 
