@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiAtomicToolMapper">
+
+    <resultMap type="AiAtomicTool" id="AiAtomicToolResult">
+        <id     property="id"           column="id"/>
+        <result property="toolCode"     column="tool_code"/>
+        <result property="toolName"     column="tool_name"/>
+        <result property="category"     column="category"/>
+        <result property="description"  column="description"/>
+        <result property="inputSchema"  column="input_schema"/>
+        <result property="outputSchema" column="output_schema"/>
+        <result property="isBuiltin"    column="is_builtin"/>
+        <result property="isEnabled"    column="is_enabled"/>
+        <result property="sortOrder"    column="sort_order"/>
+        <result property="createTime"   column="create_time"/>
+        <result property="updateTime"   column="update_time"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        id, tool_code, tool_name, category, description,
+        input_schema::text as input_schema,
+        output_schema::text as output_schema,
+        is_builtin, is_enabled, sort_order, create_time, update_time
+    </sql>
+
+    <select id="selectById" resultMap="AiAtomicToolResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_atomic_tools
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByCode" resultMap="AiAtomicToolResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_atomic_tools
+        WHERE tool_code = #{toolCode}
+        LIMIT 1
+    </select>
+
+    <select id="selectList" resultMap="AiAtomicToolResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_atomic_tools
+        <where>
+            <if test="toolName != null and toolName != ''">tool_name LIKE CONCAT('%', #{toolName}, '%')</if>
+            <if test="category != null and category != ''">AND category = #{category}</if>
+            <if test="isEnabled != null and isEnabled != ''">AND is_enabled = #{isEnabled}</if>
+        </where>
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_atomic_tools (
+            tool_code, tool_name, category, description,
+            <if test="inputSchema != null">input_schema,</if>
+            <if test="outputSchema != null">output_schema,</if>
+            is_builtin, is_enabled, sort_order, create_time, update_time
+        ) VALUES (
+            #{toolCode}, #{toolName}, #{category}, #{description},
+            <if test="inputSchema != null">#{inputSchema}::jsonb,</if>
+            <if test="outputSchema != null">#{outputSchema}::jsonb,</if>
+            #{isBuiltin}, #{isEnabled}, #{sortOrder}, NOW(), NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ai_atomic_tools
+        <set>
+            <if test="toolCode != null">tool_code = #{toolCode},</if>
+            <if test="toolName != null">tool_name = #{toolName},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="inputSchema != null">input_schema = #{inputSchema}::jsonb,</if>
+            <if test="outputSchema != null">output_schema = #{outputSchema}::jsonb,</if>
+            <if test="isEnabled != null">is_enabled = #{isEnabled},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        DELETE FROM ai_atomic_tools WHERE id = #{id} AND is_builtin = '0'
+    </update>
+
+    <update id="deleteByIds">
+        DELETE FROM ai_atomic_tools WHERE is_builtin = '0' AND id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+</mapper>

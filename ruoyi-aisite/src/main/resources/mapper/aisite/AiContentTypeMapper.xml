@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiContentTypeMapper">
+
+    <resultMap type="AiContentType" id="AiContentTypeResult">
+        <result property="id"           column="id"           />
+        <result property="siteId"       column="site_id"      />
+        <result property="code"         column="code"         />
+        <result property="name"         column="name"         />
+        <result property="description"  column="description"  />
+        <result property="schemaJson"   column="schema_json"  />
+        <result property="listFields"   column="list_fields"  />
+        <result property="detailFields" column="detail_fields"/>
+        <result property="filterFields" column="filter_fields"/>
+        <result property="seoTemplate"  column="seo_template" />
+        <result property="sortOrder"    column="sort_order"   />
+        <result property="isSystem"     column="is_system"    />
+        <result property="status"       column="status"       />
+        <result property="delFlag"      column="del_flag"     />
+        <result property="createBy"     column="create_by"    />
+        <result property="createTime"   column="create_time"  />
+        <result property="updateBy"     column="update_by"    />
+        <result property="updateTime"   column="update_time"  />
+        <result property="itemCount"    column="item_count"   />
+    </resultMap>
+
+    <sql id="selectAiContentTypeVo">
+        select t.id, t.site_id, t.code, t.name, t.description,
+               t.schema_json::text as schema_json,
+               t.list_fields::text as list_fields,
+               t.detail_fields::text as detail_fields,
+               t.filter_fields::text as filter_fields,
+               t.seo_template::text as seo_template,
+               t.sort_order, t.is_system, t.status, t.del_flag,
+               t.create_by, t.create_time, t.update_by, t.update_time,
+               (select count(*) from ai_content_items i where i.type_code = t.code
+                   and (t.site_id is null or i.site_id = t.site_id)
+                   and i.del_flag = '0') as item_count
+        from ai_content_types t
+    </sql>
+
+    <select id="selectAiContentTypeById" parameterType="Long" resultMap="AiContentTypeResult">
+        <include refid="selectAiContentTypeVo"/>
+        where t.id = #{id} and t.del_flag = '0'
+    </select>
+
+    <select id="selectAiContentTypeByCode" resultMap="AiContentTypeResult">
+        <include refid="selectAiContentTypeVo"/>
+        where t.code = #{code} and t.del_flag = '0'
+          and (t.site_id = #{siteId} or t.site_id is null)
+        order by t.site_id desc nulls last
+        limit 1
+    </select>
+
+    <select id="selectAiContentTypeList" parameterType="AiContentType" resultMap="AiContentTypeResult">
+        <include refid="selectAiContentTypeVo"/>
+        <where>
+            t.del_flag = '0'
+            <if test="siteId != null">
+                and (t.site_id = #{siteId} or t.site_id is null)
+            </if>
+            <if test="code != null and code != ''">
+                and t.code like concat('%', #{code}, '%')
+            </if>
+            <if test="name != null and name != ''">
+                and t.name like concat('%', #{name}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                and t.status = #{status}
+            </if>
+        </where>
+        order by t.sort_order asc, t.create_time desc
+    </select>
+
+    <insert id="insertAiContentType" parameterType="AiContentType" useGeneratedKeys="true" keyProperty="id">
+        insert into ai_content_types
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">site_id,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="description != null">description,</if>
+            <if test="schemaJson != null">schema_json,</if>
+            <if test="listFields != null">list_fields,</if>
+            <if test="detailFields != null">detail_fields,</if>
+            <if test="filterFields != null">filter_fields,</if>
+            <if test="seoTemplate != null">seo_template,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="isSystem != null">is_system,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">#{siteId},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="description != null">#{description},</if>
+            <if test="schemaJson != null">#{schemaJson}::jsonb,</if>
+            <if test="listFields != null">#{listFields}::jsonb,</if>
+            <if test="detailFields != null">#{detailFields}::jsonb,</if>
+            <if test="filterFields != null">#{filterFields}::jsonb,</if>
+            <if test="seoTemplate != null">#{seoTemplate}::jsonb,</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="isSystem != null">#{isSystem},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateAiContentType" parameterType="AiContentType">
+        update ai_content_types
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="schemaJson != null">schema_json = #{schemaJson}::jsonb,</if>
+            <if test="listFields != null">list_fields = #{listFields}::jsonb,</if>
+            <if test="detailFields != null">detail_fields = #{detailFields}::jsonb,</if>
+            <if test="filterFields != null">filter_fields = #{filterFields}::jsonb,</if>
+            <if test="seoTemplate != null">seo_template = #{seoTemplate}::jsonb,</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="isSystem != null">is_system = #{isSystem},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteAiContentTypeById" parameterType="Long">
+        update ai_content_types set del_flag = '1' where id = #{id}
+    </update>
+
+    <update id="deleteAiContentTypeByIds" parameterType="Long">
+        update ai_content_types set del_flag = '1' where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+</mapper>

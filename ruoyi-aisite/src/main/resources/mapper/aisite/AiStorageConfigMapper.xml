@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiStorageConfigMapper">
+
+    <resultMap type="AiStorageConfig" id="AiStorageConfigResult">
+        <id     property="id"          column="id"/>
+        <result property="siteId"      column="site_id"/>
+        <result property="name"        column="name"/>
+        <result property="code"        column="code"/>
+        <result property="storageType" column="storage_type"/>
+        <result property="isDefault"   column="is_default"/>
+        <result property="configJson"  column="config_json"/>
+        <result property="cdnUrl"      column="cdn_url"/>
+        <result property="status"      column="status"/>
+        <result property="delFlag"     column="del_flag"/>
+        <result property="createBy"    column="create_by"/>
+        <result property="createTime"  column="create_time"/>
+        <result property="updateBy"    column="update_by"/>
+        <result property="updateTime"  column="update_time"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        id, site_id, name, code, storage_type, is_default,
+        config_json::text AS config_json,
+        cdn_url, status, del_flag, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="selectById" resultMap="AiStorageConfigResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_storage_configs
+        WHERE id = #{id} AND del_flag = '0'
+    </select>
+
+    <select id="selectList" resultMap="AiStorageConfigResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_storage_configs
+        <where>
+            del_flag = '0'
+            <if test="siteId != null">AND site_id = #{siteId}</if>
+            <if test="name != null and name != ''">AND name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="storageType != null and storageType != ''">AND storage_type = #{storageType}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        ORDER BY is_default DESC, id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_storage_configs (
+            <if test="siteId != null">site_id,</if>
+            name, code, storage_type, is_default,
+            <if test="configJson != null">config_json,</if>
+            <if test="cdnUrl != null">cdn_url,</if>
+            status, del_flag, create_by, create_time, update_by, update_time
+        ) VALUES (
+            <if test="siteId != null">#{siteId},</if>
+            #{name}, #{code}, #{storageType}, #{isDefault},
+            <if test="configJson != null">#{configJson}::jsonb,</if>
+            <if test="cdnUrl != null">#{cdnUrl},</if>
+            #{status}, #{delFlag}, #{createBy}, NOW(), #{updateBy}, NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ai_storage_configs
+        <set>
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="storageType != null">storage_type = #{storageType},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="configJson != null">config_json = #{configJson}::jsonb,</if>
+            <if test="cdnUrl != null">cdn_url = #{cdnUrl},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE ai_storage_configs SET del_flag = '1', update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE ai_storage_configs SET del_flag = '1', update_time = NOW()
+        WHERE id IN
+        <foreach collection="array" item="id" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+</mapper>

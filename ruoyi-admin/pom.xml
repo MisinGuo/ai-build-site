@@ -61,10 +61,11 @@
             <artifactId>ruoyi-generator</artifactId>
         </dependency>
 
-        <!-- 游戏盒子模块-->
+        <!-- AI建站运营平台核心模块-->
         <dependency>
             <groupId>com.ruoyi</groupId>
-            <artifactId>ruoyi-gamebox</artifactId>
+            <artifactId>ruoyi-aisite</artifactId>
+            <version>${ruoyi.version}</version>
         </dependency>
 
         <!-- WebSocket 支持（ServerEndpoint + ServerEndpointExporter）-->

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiWorkflowMapper">
+
+    <resultMap type="AiWorkflow" id="AiWorkflowResult">
+        <id     property="id"           column="id"/>
+        <result property="name"         column="name"/>
+        <result property="code"         column="code"/>
+        <result property="description"  column="description"/>
+        <result property="category"     column="category"/>
+        <result property="stepsJson"    column="steps_json"/>
+        <result property="paramsSchema" column="params_schema"/>
+        <result property="isBuiltin"    column="is_builtin"/>
+        <result property="isEnabled"    column="is_enabled"/>
+        <result property="version"      column="version"/>
+        <result property="creatorId"    column="creator_id"/>
+        <result property="delFlag"      column="del_flag"/>
+        <result property="createBy"     column="create_by"/>
+        <result property="createTime"   column="create_time"/>
+        <result property="updateBy"     column="update_by"/>
+        <result property="updateTime"   column="update_time"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        id, name, code, description, category,
+        steps_json::text as steps_json,
+        params_schema::text as params_schema,
+        is_builtin, is_enabled, version, creator_id, del_flag,
+        create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="selectById" resultMap="AiWorkflowResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_workflows
+        WHERE id = #{id} AND del_flag = '0'
+    </select>
+
+    <select id="selectByCode" resultMap="AiWorkflowResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_workflows
+        WHERE code = #{code} AND del_flag = '0'
+        LIMIT 1
+    </select>
+
+    <select id="selectList" resultMap="AiWorkflowResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_workflows
+        <where>
+            del_flag = '0'
+            <if test="name != null and name != ''">AND name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="code != null and code != ''">AND code LIKE CONCAT('%', #{code}, '%')</if>
+            <if test="category != null and category != ''">AND category = #{category}</if>
+            <if test="isEnabled != null and isEnabled != ''">AND is_enabled = #{isEnabled}</if>
+        </where>
+        ORDER BY is_builtin DESC, id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_workflows (
+            name, code, description, category,
+            <if test="stepsJson != null">steps_json,</if>
+            <if test="paramsSchema != null">params_schema,</if>
+            is_builtin, is_enabled, version, creator_id, del_flag,
+            create_by, create_time, update_by, update_time
+        ) VALUES (
+            #{name}, #{code}, #{description}, #{category},
+            <if test="stepsJson != null">#{stepsJson}::jsonb,</if>
+            <if test="paramsSchema != null">#{paramsSchema}::jsonb,</if>
+            #{isBuiltin}, #{isEnabled}, #{version}, #{creatorId}, #{delFlag},
+            #{createBy}, NOW(), #{updateBy}, NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ai_workflows
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="stepsJson != null">steps_json = #{stepsJson}::jsonb,</if>
+            <if test="paramsSchema != null">params_schema = #{paramsSchema}::jsonb,</if>
+            <if test="isEnabled != null">is_enabled = #{isEnabled},</if>
+            <if test="version != null">version = #{version},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE ai_workflows SET del_flag = '1', update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE ai_workflows SET del_flag = '1', update_time = NOW()
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+</mapper>

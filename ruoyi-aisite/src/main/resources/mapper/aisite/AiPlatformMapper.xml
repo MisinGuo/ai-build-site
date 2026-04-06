@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiPlatformMapper">
+
+    <resultMap type="AiPlatform" id="AiPlatformResult">
+        <id     property="id"           column="id"/>
+        <result property="name"         column="name"/>
+        <result property="platformType" column="platform_type"/>
+        <result property="apiKey"       column="api_key"/>
+        <result property="baseUrl"      column="base_url"/>
+        <result property="modelName"    column="model_name"/>
+        <result property="maxTokens"    column="max_tokens"/>
+        <result property="temperature"  column="temperature"/>
+        <result property="extraConfig"  column="extra_config"/>
+        <result property="isDefault"    column="is_default"/>
+        <result property="status"       column="status"/>
+        <result property="delFlag"      column="del_flag"/>
+        <result property="createBy"     column="create_by"/>
+        <result property="createTime"   column="create_time"/>
+        <result property="updateBy"     column="update_by"/>
+        <result property="updateTime"   column="update_time"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        id, name, platform_type, api_key, base_url, model_name, max_tokens, temperature,
+        extra_config::text as extra_config,
+        is_default, status, del_flag, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="selectById" resultMap="AiPlatformResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_platforms
+        WHERE id = #{id} AND del_flag = '0'
+    </select>
+
+    <select id="selectList" resultMap="AiPlatformResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_platforms
+        <where>
+            del_flag = '0'
+            <if test="name != null and name != ''">AND name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="platformType != null and platformType != ''">AND platform_type = #{platformType}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        ORDER BY is_default DESC, id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_platforms (
+            name, platform_type, api_key, base_url, model_name, max_tokens, temperature,
+            <if test="extraConfig != null">extra_config,</if>
+            is_default, status, del_flag, create_by, create_time, update_by, update_time
+        ) VALUES (
+            #{name}, #{platformType}, #{apiKey}, #{baseUrl}, #{modelName}, #{maxTokens}, #{temperature},
+            <if test="extraConfig != null">#{extraConfig}::jsonb,</if>
+            #{isDefault}, #{status}, #{delFlag}, #{createBy}, NOW(), #{updateBy}, NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ai_platforms
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="platformType != null">platform_type = #{platformType},</if>
+            <if test="apiKey != null">api_key = #{apiKey},</if>
+            <if test="baseUrl != null">base_url = #{baseUrl},</if>
+            <if test="modelName != null">model_name = #{modelName},</if>
+            <if test="maxTokens != null">max_tokens = #{maxTokens},</if>
+            <if test="temperature != null">temperature = #{temperature},</if>
+            <if test="extraConfig != null">extra_config = #{extraConfig}::jsonb,</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE ai_platforms SET del_flag = '1', update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE ai_platforms SET del_flag = '1', update_time = NOW()
+        WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+</mapper>

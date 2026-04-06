@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiContentItemMapper">
+
+    <resultMap type="AiContentItem" id="AiContentItemResult">
+        <result property="id"             column="id"              />
+        <result property="siteId"         column="site_id"         />
+        <result property="typeCode"       column="type_code"       />
+        <result property="title"          column="title"           />
+        <result property="slug"           column="slug"            />
+        <result property="coverImage"     column="cover_image"     />
+        <result property="summary"        column="summary"         />
+        <result property="content"        column="content"         />
+        <result property="fieldsJson"     column="fields_json"     />
+        <result property="seoTitle"       column="seo_title"       />
+        <result property="seoDescription" column="seo_description" />
+        <result property="seoKeywords"    column="seo_keywords"    />
+        <result property="canonicalUrl"   column="canonical_url"   />
+        <result property="publishStatus"  column="publish_status"  />
+        <result property="publishAt"      column="publish_at"      />
+        <result property="isFeatured"     column="is_featured"     />
+        <result property="sortOrder"      column="sort_order"      />
+        <result property="viewCount"      column="view_count"      />
+        <result property="creatorId"      column="creator_id"      />
+        <result property="deptId"         column="dept_id"         />
+        <result property="status"         column="status"          />
+        <result property="delFlag"        column="del_flag"        />
+        <result property="createBy"       column="create_by"       />
+        <result property="createTime"     column="create_time"     />
+        <result property="updateBy"       column="update_by"       />
+        <result property="updateTime"     column="update_time"     />
+        <result property="typeName"       column="type_name"       />
+    </resultMap>
+
+    <sql id="selectAiContentItemVo">
+        select i.id, i.site_id, i.type_code, i.title, i.slug, i.cover_image, i.summary,
+               i.fields_json::text as fields_json,
+               i.seo_title, i.seo_description, i.seo_keywords, i.canonical_url,
+               i.publish_status, i.publish_at, i.is_featured, i.sort_order, i.view_count,
+               i.creator_id, i.dept_id, i.status, i.del_flag,
+               i.create_by, i.create_time, i.update_by, i.update_time,
+               ct.name as type_name
+        from ai_content_items i
+        left join ai_content_types ct on ct.code = i.type_code and ct.del_flag = '0'
+            and (ct.site_id = i.site_id or ct.site_id is null)
+    </sql>
+
+    <!-- 列表查询（不包含 content 大字段，提升性能） -->
+    <sql id="selectAiContentItemListVo">
+        select i.id, i.site_id, i.type_code, i.title, i.slug, i.cover_image, i.summary,
+               i.seo_title, i.seo_description, i.seo_keywords,
+               i.publish_status, i.publish_at, i.is_featured, i.sort_order, i.view_count,
+               i.creator_id, i.dept_id, i.status, i.del_flag,
+               i.create_by, i.create_time, i.update_by, i.update_time,
+               ct.name as type_name
+        from ai_content_items i
+        left join ai_content_types ct on ct.code = i.type_code and ct.del_flag = '0'
+            and (ct.site_id = i.site_id or ct.site_id is null)
+    </sql>
+
+    <select id="selectAiContentItemById" parameterType="Long" resultMap="AiContentItemResult">
+        <include refid="selectAiContentItemVo"/>
+        where i.id = #{id} and i.del_flag = '0'
+    </select>
+
+    <select id="selectAiContentItemBySlug" resultMap="AiContentItemResult">
+        <include refid="selectAiContentItemVo"/>
+        where i.site_id = #{siteId} and i.type_code = #{typeCode} and i.slug = #{slug} and i.del_flag = '0'
+        limit 1
+    </select>
+
+    <select id="selectAiContentItemList" parameterType="AiContentItem" resultMap="AiContentItemResult">
+        <include refid="selectAiContentItemListVo"/>
+        <where>
+            i.del_flag = '0'
+            <if test="siteId != null">
+                and i.site_id = #{siteId}
+            </if>
+            <if test="typeCode != null and typeCode != ''">
+                and i.type_code = #{typeCode}
+            </if>
+            <if test="title != null and title != ''">
+                and i.title like concat('%', #{title}, '%')
+            </if>
+            <if test="publishStatus != null and publishStatus != ''">
+                and i.publish_status = #{publishStatus}
+            </if>
+            <if test="isFeatured != null and isFeatured != ''">
+                and i.is_featured = #{isFeatured}
+            </if>
+            <if test="status != null and status != ''">
+                and i.status = #{status}
+            </if>
+        </where>
+        order by i.sort_order asc, i.create_time desc
+    </select>
+
+    <insert id="insertAiContentItem" parameterType="AiContentItem" useGeneratedKeys="true" keyProperty="id">
+        insert into ai_content_items
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">site_id,</if>
+            <if test="typeCode != null and typeCode != ''">type_code,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="slug != null and slug != ''">slug,</if>
+            <if test="coverImage != null">cover_image,</if>
+            <if test="summary != null">summary,</if>
+            <if test="content != null">content,</if>
+            <if test="fieldsJson != null">fields_json,</if>
+            <if test="seoTitle != null">seo_title,</if>
+            <if test="seoDescription != null">seo_description,</if>
+            <if test="seoKeywords != null">seo_keywords,</if>
+            <if test="canonicalUrl != null">canonical_url,</if>
+            <if test="publishStatus != null">publish_status,</if>
+            <if test="publishAt != null">publish_at,</if>
+            <if test="isFeatured != null">is_featured,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="creatorId != null">creator_id,</if>
+            <if test="deptId != null">dept_id,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">#{siteId},</if>
+            <if test="typeCode != null and typeCode != ''">#{typeCode},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="slug != null and slug != ''">#{slug},</if>
+            <if test="coverImage != null">#{coverImage},</if>
+            <if test="summary != null">#{summary},</if>
+            <if test="content != null">#{content},</if>
+            <if test="fieldsJson != null">#{fieldsJson}::jsonb,</if>
+            <if test="seoTitle != null">#{seoTitle},</if>
+            <if test="seoDescription != null">#{seoDescription},</if>
+            <if test="seoKeywords != null">#{seoKeywords},</if>
+            <if test="canonicalUrl != null">#{canonicalUrl},</if>
+            <if test="publishStatus != null">#{publishStatus},</if>
+            <if test="publishAt != null">#{publishAt},</if>
+            <if test="isFeatured != null">#{isFeatured},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="creatorId != null">#{creatorId},</if>
+            <if test="deptId != null">#{deptId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+        </trim>
+    </insert>
+
+    <update id="updateAiContentItem" parameterType="AiContentItem">
+        update ai_content_items
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="typeCode != null and typeCode != ''">type_code = #{typeCode},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="slug != null and slug != ''">slug = #{slug},</if>
+            <if test="coverImage != null">cover_image = #{coverImage},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="fieldsJson != null">fields_json = #{fieldsJson}::jsonb,</if>
+            <if test="seoTitle != null">seo_title = #{seoTitle},</if>
+            <if test="seoDescription != null">seo_description = #{seoDescription},</if>
+            <if test="seoKeywords != null">seo_keywords = #{seoKeywords},</if>
+            <if test="canonicalUrl != null">canonical_url = #{canonicalUrl},</if>
+            <if test="publishStatus != null">publish_status = #{publishStatus},</if>
+            <if test="publishAt != null">publish_at = #{publishAt},</if>
+            <if test="isFeatured != null">is_featured = #{isFeatured},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteAiContentItemById" parameterType="Long">
+        update ai_content_items set del_flag = '1' where id = #{id}
+    </update>
+
+    <update id="deleteAiContentItemByIds" parameterType="Long">
+        update ai_content_items set del_flag = '1' where id in
+        <foreach collection="array" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="incrementViewCount" parameterType="Long">
+        update ai_content_items set view_count = view_count + 1 where id = #{id}
+    </update>
+
+</mapper>
