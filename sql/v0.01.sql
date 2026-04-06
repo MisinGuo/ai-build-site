@@ -1238,16 +1238,102 @@ INSERT INTO "public"."sys_menu" VALUES (2000, 'AI 建站平台', 0, 5, 'aisite',
 INSERT INTO "public"."sys_menu" VALUES (2001, '站点管理', 2000, 1, 'sites', 'aisite/sites/index', '', '', 1, 0, 'C', '0', '0', 'aisite:site:list', 'list', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2002, 'AI 建站助手', 2000, 2, 'builder', 'aisite/builder/index', '', '', 1, 0, 'C', '0', '0', 'aisite:builder:use', 'wand-magic', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2003, '矩阵站管理', 2000, 3, 'matrix', 'aisite/matrix/index', '', '', 1, 0, 'C', '0', '0', 'aisite:matrix:list', 'grid', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
-INSERT INTO "public"."sys_menu" VALUES (2004, '内容管理', 2000, 4, 'contents', 'aisite/contents/index', '', '', 1, 0, 'C', '0', '0', 'aisite:content:list', 'documentation', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
-INSERT INTO "public"."sys_menu" VALUES (2005, 'AI 运营中心', 2000, 5, 'operations', 'aisite/operations/index', '', '', 1, 0, 'C', '0', '0', 'aisite:operation:list', 'calendar', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2004, '内容管理', 2000, 4, 'content', NULL, '', '', 1, 0, 'M', '0', '0', '', 'documentation', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2005, 'AI 运营中心', 2000, 5, 'operation', NULL, '', '', 1, 0, 'M', '0', '0', '', 'calendar', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2006, 'SEO 看板', 2000, 6, 'seo', 'aisite/seo/index', '', '', 1, 0, 'C', '0', '0', 'aisite:seo:view', 'chart', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
-INSERT INTO "public"."sys_menu" VALUES (2007, '工作流', 2000, 7, 'workflows', 'aisite/workflows/index', '', '', 1, 0, 'C', '0', '0', 'aisite:workflow:list', 'flow', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
-INSERT INTO "public"."sys_menu" VALUES (2008, 'AI 平台配置', 2000, 8, 'ai-platforms', 'aisite/platforms/index', '', '', 1, 0, 'C', '0', '0', 'aisite:platform:list', 'setting', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2007, '工作流', 2000, 7, 'workflow', NULL, '', '', 1, 0, 'M', '0', '0', '', 'share', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2008, 'AI 配置', 2000, 8, 'aiconfig', NULL, '', '', 1, 0, 'M', '0', '0', '', 'setting', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2100, '站点查询', 2001, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:site:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2101, '站点新增', 2001, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:site:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2102, '站点修改', 2001, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:site:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2103, '站点删除', 2001, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:site:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 INSERT INTO "public"."sys_menu" VALUES (2104, '站点部署', 2001, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:site:deploy', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- AI 建站助手按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2200, '助手使用', 2002, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:builder:use', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2201, '历史查询', 2002, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:builder:history', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 矩阵站管理按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2300, '矩阵组查询', 2003, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:matrix:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2301, '矩阵组新增', 2003, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:matrix:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2302, '矩阵组修改', 2003, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:matrix:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2303, '矩阵组删除', 2003, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:matrix:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2304, '批量建站', 2003, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:matrix:build', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 内容管理子菜单（2004 已改为 M 目录）
+INSERT INTO "public"."sys_menu" VALUES (2040, '内容类型', 2004, 1, 'content-types', 'aisite/content-types/index', '', '', 1, 0, 'C', '0', '0', 'aisite:contentType:list', 'example', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2041, '内容项管理', 2004, 2, 'content-items', 'aisite/content-items/index', '', '', 1, 0, 'C', '0', '0', 'aisite:contentItem:list', 'documentation', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2042, '分类管理', 2004, 3, 'categories', 'aisite/categories/index', '', '', 1, 0, 'C', '0', '0', 'aisite:category:list', 'tree', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2043, '存储配置', 2004, 4, 'storage', 'aisite/storage/index', '', '', 1, 0, 'C', '0', '0', 'aisite:storage:list', 'upload', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 内容类型按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2400, '内容类型查询', 2040, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentType:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2401, '内容类型新增', 2040, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentType:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2402, '内容类型修改', 2040, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentType:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2403, '内容类型删除', 2040, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentType:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 内容项管理按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2410, '内容项查询', 2041, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentItem:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2411, '内容项新增', 2041, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentItem:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2412, '内容项修改', 2041, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentItem:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2413, '内容项删除', 2041, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentItem:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2414, '内容项导出', 2041, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:contentItem:export', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 分类管理按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2420, '分类查询', 2042, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:category:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2421, '分类新增', 2042, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:category:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2422, '分类修改', 2042, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:category:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2423, '分类删除', 2042, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:category:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 存储配置按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2430, '存储配置查询', 2043, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:storage:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2431, '存储配置新增', 2043, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:storage:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2432, '存储配置修改', 2043, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:storage:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2433, '存储配置删除', 2043, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:storage:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- AI 运营中心子菜单（2005 已改为 M 目录）
+INSERT INTO "public"."sys_menu" VALUES (2050, '运营任务', 2005, 1, 'tasks', 'aisite/operations/tasks/index', '', '', 1, 0, 'C', '0', '0', 'aisite:operTask:list', 'date', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2051, '操作日志', 2005, 2, 'oplogs', 'aisite/operations/logs/index', '', '', 1, 0, 'C', '0', '0', 'aisite:operLog:list', 'log', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 运营任务按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2500, '任务查询', 2050, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:operTask:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2501, '任务新增', 2050, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:operTask:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2502, '任务修改', 2050, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:operTask:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2503, '任务删除', 2050, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:operTask:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2504, '立即执行', 2050, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:operTask:run', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 操作日志按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2510, '日志查询', 2051, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:operLog:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2511, '日志删除', 2051, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:operLog:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- SEO 看板按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2600, 'SEO 数据查询', 2006, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:seo:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2601, 'SEO 数据刷新', 2006, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:seo:refresh', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 工作流子菜单（2007 已改为 M 目录）
+INSERT INTO "public"."sys_menu" VALUES (2070, '工作流定义', 2007, 1, 'definitions', 'aisite/workflows/index', '', '', 1, 0, 'C', '0', '0', 'aisite:workflow:list', 'tree-table', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2071, '原子工具库', 2007, 2, 'tools', 'aisite/tools/index', '', '', 1, 0, 'C', '0', '0', 'aisite:tool:list', 'component', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2072, '执行记录', 2007, 3, 'executions', 'aisite/workflows/executions/index', '', '', 1, 0, 'C', '0', '0', 'aisite:wfExec:list', 'form', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 工作流定义按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2700, '工作流查询', 2070, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:workflow:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2701, '工作流新增', 2070, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:workflow:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2702, '工作流修改', 2070, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:workflow:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2703, '工作流删除', 2070, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:workflow:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2704, '工作流执行', 2070, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:workflow:run', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 原子工具库按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2710, '工具查询', 2071, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:tool:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2711, '工具新增', 2071, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:tool:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2712, '工具修改', 2071, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:tool:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2713, '工具删除', 2071, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:tool:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 执行记录按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2720, '执行记录查询', 2072, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:wfExec:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2721, '执行记录删除', 2072, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:wfExec:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- AI 配置子菜单（2008 已改为 M 目录）
+INSERT INTO "public"."sys_menu" VALUES (2080, 'AI 平台', 2008, 1, 'platforms', 'aisite/platforms/index', '', '', 1, 0, 'C', '0', '0', 'aisite:platform:list', 'platform', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2081, 'Prompt 模板', 2008, 2, 'prompts', 'aisite/prompts/index', '', '', 1, 0, 'C', '0', '0', 'aisite:prompt:list', 'clipboard', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2082, '多语言翻译', 2008, 3, 'translations', 'aisite/translations/index', '', '', 1, 0, 'C', '0', '0', 'aisite:translation:list', 'language', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- AI 平台按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2800, '平台查询', 2080, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:platform:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2801, '平台新增', 2080, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:platform:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2802, '平台修改', 2080, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:platform:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2803, '平台删除', 2080, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:platform:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2804, '连通测试', 2080, 5, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:platform:test', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- Prompt 模板按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2810, '模板查询', 2081, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:prompt:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2811, '模板新增', 2081, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:prompt:add', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2812, '模板修改', 2081, 3, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:prompt:edit', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2813, '模板删除', 2081, 4, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:prompt:remove', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+-- 多语言翻译按钮权限
+INSERT INTO "public"."sys_menu" VALUES (2820, '翻译查询', 2082, 1, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:translation:query', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
+INSERT INTO "public"."sys_menu" VALUES (2821, 'AI 批量翻译', 2082, 2, '', '', '', '', 1, 0, 'F', '0', '0', 'aisite:translation:batchAi', '#', 'admin', '2026-04-06 10:04:16.641335', '', NULL, '');
 
 -- ----------------------------
 -- Table structure for sys_notice
