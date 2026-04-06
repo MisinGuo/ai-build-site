@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiMatrixGroupMapper">
+
+    <resultMap type="AiMatrixGroup" id="AiMatrixGroupResult">
+        <id     property="id"              column="id"/>
+        <result property="name"            column="name"/>
+        <result property="description"     column="description"/>
+        <result property="templateSiteId"  column="template_site_id"/>
+        <result property="industry"        column="industry"/>
+        <result property="keywordList"     column="keyword_list"/>
+        <result property="domainPattern"   column="domain_pattern"/>
+        <result property="configOverrides" column="config_overrides"/>
+        <result property="totalCount"      column="total_count"/>
+        <result property="builtCount"      column="built_count"/>
+        <result property="liveCount"       column="live_count"/>
+        <result property="status"          column="status"/>
+        <result property="creatorId"       column="creator_id"/>
+        <result property="deptId"          column="dept_id"/>
+        <result property="delFlag"         column="del_flag"/>
+        <result property="createBy"        column="create_by"/>
+        <result property="createTime"      column="create_time"/>
+        <result property="updateBy"        column="update_by"/>
+        <result property="updateTime"      column="update_time"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        id, name, description, template_site_id, industry,
+        keyword_list::text as keyword_list,
+        domain_pattern,
+        config_overrides::text as config_overrides,
+        total_count, built_count, live_count, status,
+        creator_id, dept_id, del_flag,
+        create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="selectById" resultMap="AiMatrixGroupResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_matrix_groups
+        WHERE id = #{id} AND del_flag = '0'
+    </select>
+
+    <select id="selectList" resultMap="AiMatrixGroupResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_matrix_groups
+        <where>
+            del_flag = '0'
+            <if test="name != null and name != ''">AND name LIKE CONCAT('%', #{name}, '%')</if>
+            <if test="industry != null and industry != ''">AND industry = #{industry}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        ORDER BY id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_matrix_groups (
+            name, description, template_site_id, industry,
+            <if test="keywordList != null">keyword_list,</if>
+            domain_pattern,
+            <if test="configOverrides != null">config_overrides,</if>
+            total_count, built_count, live_count, status,
+            creator_id, dept_id, del_flag,
+            create_by, create_time, update_by, update_time
+        ) VALUES (
+            #{name}, #{description}, #{templateSiteId}, #{industry},
+            <if test="keywordList != null">#{keywordList}::jsonb,</if>
+            #{domainPattern},
+            <if test="configOverrides != null">#{configOverrides}::jsonb,</if>
+            #{totalCount}, #{builtCount}, #{liveCount}, #{status},
+            #{creatorId}, #{deptId}, #{delFlag},
+            #{createBy}, NOW(), #{updateBy}, NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ai_matrix_groups
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="templateSiteId != null">template_site_id = #{templateSiteId},</if>
+            <if test="industry != null">industry = #{industry},</if>
+            <if test="keywordList != null">keyword_list = #{keywordList}::jsonb,</if>
+            <if test="domainPattern != null">domain_pattern = #{domainPattern},</if>
+            <if test="configOverrides != null">config_overrides = #{configOverrides}::jsonb,</if>
+            <if test="totalCount != null">total_count = #{totalCount},</if>
+            <if test="builtCount != null">built_count = #{builtCount},</if>
+            <if test="liveCount != null">live_count = #{liveCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE ai_matrix_groups SET del_flag = '2' WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE ai_matrix_groups SET del_flag = '2' WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+</mapper>

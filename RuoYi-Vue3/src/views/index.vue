@@ -1,68 +1,72 @@
 <template>
   <div class="app-container home">
-    <!-- 系统概览卡片 -->
+    <!-- Hero Banner -->
+    <div class="hero-banner">
+      <div class="hero-content">
+        <div class="hero-logo">
+          <el-icon><MagicStick /></el-icon>
+        </div>
+        <h1 class="hero-title">AI 建站运营平台</h1>
+        <p class="hero-subtitle">矩阵建站 · AI 运营 · 智能内容 · 全球分发</p>
+        <div class="hero-tags">
+          <el-tag effect="plain" round>Spring Boot 2.5</el-tag>
+          <el-tag effect="plain" round type="success">Vue 3</el-tag>
+          <el-tag effect="plain" round type="warning">Next.js 14</el-tag>
+          <el-tag effect="plain" round type="danger">Cloudflare Workers</el-tag>
+        </div>
+      </div>
+    </div>
+
+    <!-- 统计卡片 -->
     <el-row :gutter="20" class="overview-cards">
       <el-col :xs="24" :sm="12" :lg="6">
-        <el-card shadow="hover" class="stat-card">
+        <el-card shadow="hover" class="stat-card" @click="goTo('/aisite/matrix')">
           <div class="stat-content">
-            <div class="stat-icon game-icon">
-              <el-icon><Trophy /></el-icon>
+            <div class="stat-icon matrix-icon">
+              <el-icon><Grid /></el-icon>
             </div>
             <div class="stat-info">
-              <div class="stat-title">游戏总数</div>
-              <div class="stat-value">{{ statistics.totalGames }}</div>
+              <div class="stat-title">矩阵站组</div>
+              <div class="stat-value">{{ stats.matrixGroups }}</div>
             </div>
           </div>
         </el-card>
       </el-col>
       <el-col :xs="24" :sm="12" :lg="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-content">
-            <div class="stat-icon box-icon">
-              <el-icon><Box /></el-icon>
-            </div>
-            <div class="stat-info">
-              <div class="stat-title">游戏盒子</div>
-              <div class="stat-value">{{ statistics.totalBoxes }}</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :xs="24" :sm="12" :lg="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-content">
-            <div class="stat-icon article-icon">
-              <el-icon><Document /></el-icon>
-            </div>
-            <div class="stat-info">
-              <div class="stat-title">文章总数</div>
-              <div class="stat-value">{{ statistics.totalArticles }}</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :xs="24" :sm="12" :lg="6">
-        <el-card shadow="hover" class="stat-card">
-          <div class="stat-content">
-            <div class="stat-icon master-article-icon">
-              <el-icon><Reading /></el-icon>
-            </div>
-            <div class="stat-info">
-              <div class="stat-title">主文章</div>
-              <div class="stat-value">{{ statistics.totalMasterArticles }}</div>
-            </div>
-          </div>
-        </el-card>
-      </el-col>
-      <el-col :xs="24" :sm="12" :lg="6">
-        <el-card shadow="hover" class="stat-card">
+        <el-card shadow="hover" class="stat-card" @click="goTo('/aisite/sites')">
           <div class="stat-content">
             <div class="stat-icon site-icon">
               <el-icon><Monitor /></el-icon>
             </div>
             <div class="stat-info">
               <div class="stat-title">推广站点</div>
-              <div class="stat-value">{{ statistics.totalSites }}</div>
+              <div class="stat-value">{{ stats.sites }}</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :sm="12" :lg="6">
+        <el-card shadow="hover" class="stat-card" @click="goTo('/aisite/content-items')">
+          <div class="stat-content">
+            <div class="stat-icon content-icon">
+              <el-icon><Document /></el-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-title">AI 内容条数</div>
+              <div class="stat-value">{{ stats.contentItems }}</div>
+            </div>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col :xs="24" :sm="12" :lg="6">
+        <el-card shadow="hover" class="stat-card" @click="goTo('/aisite/operations')">
+          <div class="stat-content">
+            <div class="stat-icon task-icon">
+              <el-icon><Operation /></el-icon>
+            </div>
+            <div class="stat-info">
+              <div class="stat-title">运营任务</div>
+              <div class="stat-value">{{ stats.operationTasks }}</div>
             </div>
           </div>
         </el-card>
@@ -77,60 +81,60 @@
             <div class="card-header">
               <span class="card-title">
                 <el-icon><InfoFilled /></el-icon>
-                游戏推广 CMS 系统
+                AI 建站运营平台
               </span>
             </div>
           </template>
           <div class="intro-content">
             <p class="intro-desc">
-              基于若依框架开发的游戏推广内容管理系统，专注于游戏内容的智能化生产与多站点分发。
+              基于若依框架构建的全行业 AI 建站运营平台，支持矩阵站点创建、AI 内容自动生产、工作流编排与全球边缘分发，一站式管理从建站到增长的全链路。
             </p>
             <div class="feature-grid">
               <div class="feature-item">
-                <el-icon class="feature-icon" color="#409EFF"><EditPen /></el-icon>
+                <el-icon class="feature-icon" color="#409EFF"><Grid /></el-icon>
                 <div class="feature-text">
-                  <h4>AI 内容生成</h4>
-                  <p>集成 AI 自动生成游戏攻略、评测等优质内容</p>
+                  <h4>矩阵站点管理</h4>
+                  <p>统一管理多行业、多语言矩阵站组，批量部署</p>
                 </div>
               </div>
               <div class="feature-item">
-                <el-icon class="feature-icon" color="#67C23A"><Link /></el-icon>
+                <el-icon class="feature-icon" color="#67C23A"><MagicStick /></el-icon>
                 <div class="feature-text">
-                  <h4>智能关联管理</h4>
-                  <p>游戏盒子、游戏、文章的多对多关系管理</p>
+                  <h4>AI 内容生产</h4>
+                  <p>原子工具 + 工作流编排，自动生成高质量内容</p>
                 </div>
               </div>
               <div class="feature-item">
-                <el-icon class="feature-icon" color="#E6A23C"><Grid /></el-icon>
+                <el-icon class="feature-icon" color="#E6A23C"><SetUp /></el-icon>
                 <div class="feature-text">
-                  <h4>多站点管理</h4>
-                  <p>统一后台管理多个推广站点内容</p>
+                  <h4>工作流编排</h4>
+                  <p>可视化配置内容生产流程，AI 工具自由组合</p>
                 </div>
               </div>
               <div class="feature-item">
                 <el-icon class="feature-icon" color="#F56C6C"><Connection /></el-icon>
                 <div class="feature-text">
-                  <h4>边缘部署</h4>
-                  <p>Next.js 站点部署在 Cloudflare，SEO 友好</p>
+                  <h4>边缘全球分发</h4>
+                  <p>Next.js + Cloudflare Workers，SSR/ISR SEO 友好</p>
                 </div>
               </div>
               <div class="feature-item">
-                <el-icon class="feature-icon" color="#909399"><Tools /></el-icon>
+                <el-icon class="feature-icon" color="#909399"><TrendCharts /></el-icon>
                 <div class="feature-text">
-                  <h4>工作流编排</h4>
-                  <p>可视化工具编排，自动化内容生产流程</p>
+                  <h4>SEO 数据看板</h4>
+                  <p>关键词排名、流量趋势、历史快照一览</p>
                 </div>
               </div>
               <div class="feature-item">
-                <el-icon class="feature-icon" color="#13C2C2"><MagicStick /></el-icon>
+                <el-icon class="feature-icon" color="#13C2C2"><Translate /></el-icon>
                 <div class="feature-text">
-                  <h4>多语言翻译</h4>
-                  <p>支持内容多语言翻译和本地化管理</p>
+                  <h4>多语言支持</h4>
+                  <p>内容多语言翻译与本地化，覆盖全球市场</p>
                 </div>
               </div>
             </div>
             <div class="version-info">
-              <el-tag type="primary">当前版本: v{{ version }}</el-tag>
+              <el-tag type="primary">当前版本: v1.0.0</el-tag>
             </div>
           </div>
         </el-card>
@@ -150,49 +154,49 @@
           <div class="quick-links">
             <el-row :gutter="15">
               <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('game-mgmt/game')">
-                  <el-icon class="link-icon" color="#409EFF"><Trophy /></el-icon>
-                  <span>游戏列表</span>
+                <div class="quick-link-item" @click="goTo('/aisite/matrix')">
+                  <el-icon class="link-icon" color="#409EFF"><Grid /></el-icon>
+                  <span>矩阵站管理</span>
                 </div>
               </el-col>
               <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('game-mgmt/box')">
-                  <el-icon class="link-icon" color="#67C23A"><Box /></el-icon>
-                  <span>游戏盒子</span>
-                </div>
-              </el-col>
-              <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('content/article')">
-                  <el-icon class="link-icon" color="#E6A23C"><Document /></el-icon>
-                  <span>文章管理</span>
-                </div>
-              </el-col>
-              <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('config/site')">
-                  <el-icon class="link-icon" color="#F56C6C"><Monitor /></el-icon>
+                <div class="quick-link-item" @click="goTo('/aisite/sites')">
+                  <el-icon class="link-icon" color="#67C23A"><Monitor /></el-icon>
                   <span>站点管理</span>
                 </div>
               </el-col>
               <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('content/workflow')">
-                  <el-icon class="link-icon" color="#909399"><SetUp /></el-icon>
-                  <span>工作流配置</span>
+                <div class="quick-link-item" @click="goTo('/aisite/content-items')">
+                  <el-icon class="link-icon" color="#E6A23C"><Document /></el-icon>
+                  <span>内容管理</span>
                 </div>
               </el-col>
               <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('config/category')">
+                <div class="quick-link-item" @click="goTo('/aisite/operations')">
+                  <el-icon class="link-icon" color="#F56C6C"><Operation /></el-icon>
+                  <span>运营任务</span>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div class="quick-link-item" @click="goTo('/aisite/workflows')">
+                  <el-icon class="link-icon" color="#909399"><SetUp /></el-icon>
+                  <span>工作流</span>
+                </div>
+              </el-col>
+              <el-col :span="12">
+                <div class="quick-link-item" @click="goTo('/aisite/categories')">
                   <el-icon class="link-icon" color="#409EFF"><List /></el-icon>
                   <span>分类管理</span>
                 </div>
               </el-col>
               <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('config/storage')">
+                <div class="quick-link-item" @click="goTo('/aisite/storage-configs')">
                   <el-icon class="link-icon" color="#67C23A"><FolderOpened /></el-icon>
                   <span>存储配置</span>
                 </div>
               </el-col>
               <el-col :span="12">
-                <div class="quick-link-item" @click="goTo('ai-config/atomic-tool')">
+                <div class="quick-link-item" @click="goTo('/aisite/atomic-tools')">
                   <el-icon class="link-icon" color="#E6A23C"><Tools /></el-icon>
                   <span>原子工具</span>
                 </div>
@@ -271,30 +275,30 @@
           </template>
           <div class="tips-content">
             <el-alert
-              title="欢迎使用游戏推广 CMS 系统"
+              title="欢迎使用 AI 建站运营平台"
               type="success"
               :closable="false"
               style="margin-bottom: 15px"
             >
               <template #default>
-                开始管理您的游戏推广内容吧！
+                开始构建您的矩阵站点吧！
               </template>
             </el-alert>
             <div class="tip-item">
               <el-icon color="#409EFF"><CircleCheck /></el-icon>
-              <span>支持批量导入游戏和内容数据</span>
+              <span>在「矩阵站管理」中创建站组并关联站点</span>
             </div>
             <div class="tip-item">
               <el-icon color="#67C23A"><CircleCheck /></el-icon>
-              <span>使用 AI 工具快速生成文章内容</span>
+              <span>配置原子工具和工作流，自动化内容生产</span>
             </div>
             <div class="tip-item">
               <el-icon color="#E6A23C"><CircleCheck /></el-icon>
-              <span>通过工作流编排自动化内容生产</span>
+              <span>在「AI 建站」模块一键生成站点配置</span>
             </div>
             <div class="tip-item">
               <el-icon color="#F56C6C"><CircleCheck /></el-icon>
-              <span>多站点内容统一管理和分发</span>
+              <span>SEO 看板实时监控关键词与流量趋势</span>
             </div>
           </div>
         </el-card>
@@ -304,55 +308,21 @@
 </template>
 
 <script setup name="Index">
-import { ref, onMounted, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { getDashboardStatistics } from '@/api/gamebox/dashboard'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const route = useRoute()
-const version = ref('1.0.0')
 
-// 统计数据
-const statistics = ref({
-  totalGames: '-',
-  totalBoxes: '-',
-  totalArticles: '-',
-  totalMasterArticles: '-',
-  totalSites: '-'
+const stats = ref({
+  matrixGroups: '-',
+  sites: '-',
+  contentItems: '-',
+  operationTasks: '-'
 })
 
-// 获取统计数据
-const loadStatistics = async () => {
-  try {
-    const res = await getDashboardStatistics()
-    if (res.code === 200 && res.data) {
-      statistics.value.totalGames = res.data.totalGames ?? '-'
-      statistics.value.totalBoxes = res.data.totalBoxes ?? '-'
-      statistics.value.totalArticles = res.data.totalArticles ?? '-'
-      statistics.value.totalMasterArticles = res.data.totalMasterArticles ?? '-'
-      statistics.value.totalSites = res.data.totalSites ?? '-'
-    }
-  } catch (error) {
-    console.error('加载统计数据失败', error)
-  }
+const goTo = (path) => {
+  router.push(path)
 }
-
-// 跳转页面 - 使用菜单路由的相对路径
-const goTo = (menuPath) => {
-  router.push('/gamebox/' + menuPath)
-}
-
-// 监听路由变化，当返回首页时重新加载数据
-watch(() => route.path, (newPath) => {
-  if (newPath === '/index' || newPath === '/') {
-    loadStatistics()
-  }
-})
-
-// 组件挂载时加载数据
-onMounted(() => {
-  loadStatistics()
-})
 </script>
 
 <style scoped lang="scss">
@@ -360,6 +330,50 @@ onMounted(() => {
   font-family: "open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   color: #676a6c;
+
+  // Hero Banner
+  .hero-banner {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    border-radius: 12px;
+    padding: 48px 40px;
+    margin-bottom: 20px;
+    text-align: center;
+
+    .hero-logo {
+      font-size: 56px;
+      color: #e94560;
+      margin-bottom: 16px;
+      .el-icon { font-size: 56px; }
+    }
+
+    .hero-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 12px 0;
+      letter-spacing: 2px;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+      color: #a8b2c8;
+      margin: 0 0 20px 0;
+      letter-spacing: 1px;
+    }
+
+    .hero-tags {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+
+      .el-tag {
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #fff;
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+  }
 
   // 统计卡片样式
   .overview-cards {
@@ -386,28 +400,23 @@ onMounted(() => {
           font-size: 28px;
           margin-right: 20px;
 
-          &.game-icon {
+          &.matrix-icon {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-          }
-
-          &.box-icon {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-          }
-
-          &.article-icon {
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
-          }
-
-          &.master-article-icon {
-            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             color: white;
           }
 
           &.site-icon {
             background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+          }
+
+          &.content-icon {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+          }
+
+          &.task-icon {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             color: white;
           }
         }

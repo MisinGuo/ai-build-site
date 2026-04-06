@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiOperationTaskMapper">
+
+    <resultMap type="AiOperationTask" id="AiOperationTaskResult">
+        <id     property="id"            column="id"/>
+        <result property="siteId"        column="site_id"/>
+        <result property="matrixGroupId" column="matrix_group_id"/>
+        <result property="taskType"      column="task_type"/>
+        <result property="taskName"      column="task_name"/>
+        <result property="triggerType"   column="trigger_type"/>
+        <result property="cronExpr"      column="cron_expr"/>
+        <result property="taskParams"     column="params"/>
+        <result property="priority"      column="priority"/>
+        <result property="status"        column="status"/>
+        <result property="lastRunAt"     column="last_run_at"/>
+        <result property="nextRunAt"     column="next_run_at"/>
+        <result property="lastResult"    column="last_result"/>
+        <result property="retryCount"    column="retry_count"/>
+        <result property="maxRetries"    column="max_retries"/>
+        <result property="creatorId"     column="creator_id"/>
+        <result property="deptId"        column="dept_id"/>
+        <result property="delFlag"       column="del_flag"/>
+        <result property="createBy"      column="create_by"/>
+        <result property="createTime"    column="create_time"/>
+        <result property="updateBy"      column="update_by"/>
+        <result property="updateTime"    column="update_time"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        id, site_id, matrix_group_id, task_type, task_name, trigger_type, cron_expr,
+        params::text as params,
+        priority, status, last_run_at, next_run_at, last_result,
+        retry_count, max_retries, creator_id, dept_id, del_flag,
+        create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="selectById" resultMap="AiOperationTaskResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_operation_tasks
+        WHERE id = #{id} AND del_flag = '0'
+    </select>
+
+    <select id="selectList" resultMap="AiOperationTaskResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_operation_tasks
+        <where>
+            del_flag = '0'
+            <if test="siteId != null">AND site_id = #{siteId}</if>
+            <if test="taskType != null and taskType != ''">AND task_type = #{taskType}</if>
+            <if test="taskName != null and taskName != ''">AND task_name LIKE CONCAT('%', #{taskName}, '%')</if>
+            <if test="triggerType != null and triggerType != ''">AND trigger_type = #{triggerType}</if>
+            <if test="status != null and status != ''">AND status = #{status}</if>
+        </where>
+        ORDER BY priority DESC, id DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_operation_tasks (
+            site_id, matrix_group_id, task_type, task_name, trigger_type, cron_expr,
+            <if test="taskParams != null">params,</if>
+            priority, status, retry_count, max_retries,
+            creator_id, dept_id, del_flag,
+            create_by, create_time, update_by, update_time
+        ) VALUES (
+            #{siteId}, #{matrixGroupId}, #{taskType}, #{taskName}, #{triggerType}, #{cronExpr},
+            <if test="taskParams != null">#{taskParams}::jsonb,</if>
+            #{priority}, #{status}, #{retryCount}, #{maxRetries},
+            #{creatorId}, #{deptId}, #{delFlag},
+            #{createBy}, NOW(), #{updateBy}, NOW()
+        )
+    </insert>
+
+    <update id="update">
+        UPDATE ai_operation_tasks
+        <set>
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="taskType != null">task_type = #{taskType},</if>
+            <if test="taskName != null">task_name = #{taskName},</if>
+            <if test="triggerType != null">trigger_type = #{triggerType},</if>
+            <if test="cronExpr != null">cron_expr = #{cronExpr},</if>
+            <if test="taskParams != null">params = #{taskParams}::jsonb,</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="lastRunAt != null">last_run_at = #{lastRunAt},</if>
+            <if test="nextRunAt != null">next_run_at = #{nextRunAt},</if>
+            <if test="lastResult != null">last_result = #{lastResult},</if>
+            <if test="retryCount != null">retry_count = #{retryCount},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE ai_operation_tasks SET del_flag = '2' WHERE id = #{id}
+    </update>
+
+    <update id="deleteByIds">
+        UPDATE ai_operation_tasks SET del_flag = '2' WHERE id IN
+        <foreach item="id" collection="array" open="(" separator="," close=")">#{id}</foreach>
+    </update>
+
+</mapper>

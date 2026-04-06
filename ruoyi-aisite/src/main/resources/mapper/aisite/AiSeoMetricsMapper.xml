@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.aisite.mapper.AiSeoMetricsMapper">
+
+    <resultMap type="AiSeoMetrics" id="AiSeoMetricsResult">
+        <id     property="id"           column="id"/>
+        <result property="siteId"       column="site_id"/>
+        <result property="snapshotDate" column="snapshot_date"/>
+        <result property="indexedPages" column="indexed_pages"/>
+        <result property="avgPosition"  column="avg_position"/>
+        <result property="clicks"       column="clicks"/>
+        <result property="impressions"  column="impressions"/>
+        <result property="ctr"          column="ctr"/>
+        <result property="metricsJson"  column="metrics_json"/>
+    </resultMap>
+
+    <sql id="selectCols">
+        id, site_id, snapshot_date, indexed_pages, avg_position,
+        clicks, impressions, ctr,
+        metrics_json::text as metrics_json
+    </sql>
+
+    <select id="selectById" resultMap="AiSeoMetricsResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_seo_metrics_snapshots
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectBySiteId" resultMap="AiSeoMetricsResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_seo_metrics_snapshots
+        WHERE site_id = #{siteId}
+        ORDER BY snapshot_date DESC
+        LIMIT 30
+    </select>
+
+    <select id="selectList" resultMap="AiSeoMetricsResult">
+        SELECT <include refid="selectCols"/>
+        FROM ai_seo_metrics_snapshots
+        <where>
+            <if test="siteId != null">AND site_id = #{siteId}</if>
+        </where>
+        ORDER BY snapshot_date DESC
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_seo_metrics_snapshots (
+            site_id, snapshot_date, indexed_pages, avg_position,
+            clicks, impressions, ctr,
+            <if test="metricsJson != null">metrics_json</if>
+        ) VALUES (
+            #{siteId}, #{snapshotDate}, #{indexedPages}, #{avgPosition},
+            #{clicks}, #{impressions}, #{ctr},
+            <if test="metricsJson != null">#{metricsJson}::jsonb</if>
+        )
+        ON CONFLICT (site_id, snapshot_date) DO UPDATE SET
+            indexed_pages = EXCLUDED.indexed_pages,
+            avg_position  = EXCLUDED.avg_position,
+            clicks        = EXCLUDED.clicks,
+            impressions   = EXCLUDED.impressions,
+            ctr           = EXCLUDED.ctr,
+            metrics_json  = EXCLUDED.metrics_json
+    </insert>
+
+    <update id="update">
+        UPDATE ai_seo_metrics_snapshots
+        <set>
+            <if test="indexedPages != null">indexed_pages = #{indexedPages},</if>
+            <if test="avgPosition != null">avg_position = #{avgPosition},</if>
+            <if test="clicks != null">clicks = #{clicks},</if>
+            <if test="impressions != null">impressions = #{impressions},</if>
+            <if test="ctr != null">ctr = #{ctr},</if>
+            <if test="metricsJson != null">metrics_json = #{metricsJson}::jsonb,</if>
+            site_id = site_id
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM ai_seo_metrics_snapshots WHERE id = #{id}
+    </delete>
+
+</mapper>
