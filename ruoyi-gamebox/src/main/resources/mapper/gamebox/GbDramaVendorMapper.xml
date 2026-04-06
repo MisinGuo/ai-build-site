@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbDramaVendorMapper">
+    
+    <resultMap type="GbDramaVendor" id="GbDramaVendorResult">
+        <result property="id"               column="id"                />
+        <result property="name"             column="name"              />
+        <result property="code"             column="code"              />
+        <result property="contactPerson"    column="contact_person"    />
+        <result property="contactPhone"     column="contact_phone"     />
+        <result property="contactEmail"     column="contact_email"     />
+        <result property="shareRatio"       column="share_ratio"       />
+        <result property="settlementCycle"  column="settlement_cycle"  />
+        <result property="apiUrl"           column="api_url"           />
+        <result property="apiKey"           column="api_key"           />
+        <result property="apiSecret"        column="api_secret"        />
+        <result property="sortOrder"        column="sort_order"        />
+        <result property="status"           column="status"            />
+        <result property="delFlag"          column="del_flag"          />
+        <result property="createBy"         column="create_by"         />
+        <result property="createTime"       column="create_time"       />
+        <result property="updateBy"         column="update_by"         />
+        <result property="updateTime"       column="update_time"       />
+        <result property="remark"           column="remark"            />
+    </resultMap>
+
+    <sql id="selectGbDramaVendorVo">
+        select id, name, code, contact_person, contact_phone, contact_email, share_ratio, settlement_cycle, api_url, api_key, api_secret, sort_order, status, del_flag, create_by, create_time, update_by, update_time, remark from gb_drama_vendors
+    </sql>
+
+    <select id="selectGbDramaVendorList" parameterType="GbDramaVendor" resultMap="GbDramaVendorResult">
+        <include refid="selectGbDramaVendorVo"/>
+        <where>
+            del_flag = '0'
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and code = #{code}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by sort_order asc, create_time desc
+    </select>
+    
+    <select id="selectGbDramaVendorById" parameterType="Long" resultMap="GbDramaVendorResult">
+        <include refid="selectGbDramaVendorVo"/>
+        where id = #{id} and del_flag = '0'
+    </select>
+        
+    <insert id="insertGbDramaVendor" parameterType="GbDramaVendor" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_drama_vendors
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null">code,</if>
+            <if test="contactPerson != null">contact_person,</if>
+            <if test="contactPhone != null">contact_phone,</if>
+            <if test="contactEmail != null">contact_email,</if>
+            <if test="shareRatio != null">share_ratio,</if>
+            <if test="settlementCycle != null">settlement_cycle,</if>
+            <if test="apiUrl != null">api_url,</if>
+            <if test="apiKey != null">api_key,</if>
+            <if test="apiSecret != null">api_secret,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null">#{code},</if>
+            <if test="contactPerson != null">#{contactPerson},</if>
+            <if test="contactPhone != null">#{contactPhone},</if>
+            <if test="contactEmail != null">#{contactEmail},</if>
+            <if test="shareRatio != null">#{shareRatio},</if>
+            <if test="settlementCycle != null">#{settlementCycle},</if>
+            <if test="apiUrl != null">#{apiUrl},</if>
+            <if test="apiKey != null">#{apiKey},</if>
+            <if test="apiSecret != null">#{apiSecret},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbDramaVendor" parameterType="GbDramaVendor">
+        update gb_drama_vendors
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="code != null">code = #{code},</if>
+            <if test="contactPerson != null">contact_person = #{contactPerson},</if>
+            <if test="contactPhone != null">contact_phone = #{contactPhone},</if>
+            <if test="contactEmail != null">contact_email = #{contactEmail},</if>
+            <if test="shareRatio != null">share_ratio = #{shareRatio},</if>
+            <if test="settlementCycle != null">settlement_cycle = #{settlementCycle},</if>
+            <if test="apiUrl != null">api_url = #{apiUrl},</if>
+            <if test="apiKey != null">api_key = #{apiKey},</if>
+            <if test="apiSecret != null">api_secret = #{apiSecret},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteGbDramaVendorById" parameterType="Long">
+        update gb_drama_vendors set del_flag = '2' where id = #{id}
+    </update>
+
+    <update id="deleteGbDramaVendorByIds" parameterType="String">
+        update gb_drama_vendors set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

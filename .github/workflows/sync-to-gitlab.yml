@@ -1,0 +1,64 @@
+name: Sync to GitLab
+
+on:
+  push:
+    branches:
+      - v5  # 只在推送到 v5 分支时触发，但会同步所有分支到 GitLab
+      - main  # 也可以添加其他主要分支
+  workflow_dispatch:  # 支持手动触发
+    inputs:
+      reason:
+        description: '手动同步原因（可选）'
+        required: false
+        default: '手动触发同步'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # 获取完整的 git 历史记录
+          fetch-tags: true  # 获取所有标签
+      
+      - name: 同步到 GitLab
+        env:
+          GITLAB_URL: http://local.zeusai.top:8880/GameBox/gamebox.pages.misindata.com.git
+            
+               ## $使用时删除这里{{ secrets.GITLAB_URL }}  # GitLab 仓库地址，例如: https://gitlab.com/username/repo.git
+          GITLAB_TOKEN: glpat-2psl5nJndjCZJZcolcfs3W86MQp1OjkH.01.0w1tpv7sn
+            ## $使用时删除这里{{ secrets.GITLAB_TOKEN }}  # GitLab Personal Access Token
+        run: |
+          # 配置 git 用户信息
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          
+          # 获取所有远程分支的引用信息
+          git fetch origin --prune
+          
+          # 添加 GitLab 远程仓库（自动适配 http:// 和 https://）
+          GITLAB_SCHEME="${GITLAB_URL%%://*}"
+          GITLAB_HOST_PATH="${GITLAB_URL#*://}"
+          git remote add gitlab "${GITLAB_SCHEME}://oauth2:${GITLAB_TOKEN}@${GITLAB_HOST_PATH}"
+          
+          echo "📋 开始同步分支到 GitLab..."
+          
+          # 获取所有远程分支（排除 HEAD）
+          for branch in $(git branch -r | grep -v 'HEAD' | grep 'origin/' | sed 's/origin\///'); do
+            # 跳过包含特殊字符的分支名（括号等）
+            if [[ "$branch" =~ [\(\)] ]]; then
+              echo "⚠️  跳过无效分支名: $branch"
+              continue
+            fi
+            
+            echo "📤 同步分支: $branch"
+            git push gitlab "origin/$branch:refs/heads/$branch" --force || echo "❌ 分支 $branch 同步失败"
+          done
+          
+          # 同步所有标签
+          echo "📤 同步标签..."
+          git push gitlab --tags --force || echo "❌ 标签同步失败"
+          
+          echo "✅ 同步完成"

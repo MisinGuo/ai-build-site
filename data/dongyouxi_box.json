@@ -1,0 +1,75 @@
+{
+  "crawl_time": "2026-03-05T15:35:22.412317",
+  "tgid": "hb1080814",
+  "user_info": {
+    "username": "_1769136787xr"
+  },
+  "page_types": {
+    "1": {
+      "name": "默认",
+      "url": "http://gh.dongyouxi666.com/index.php/Cpsbtgame/ghLandPage/page_type/1",
+      "promotion_links": [
+        "https://wap.tsyule.cn/hb1080814-7.html",
+        "https://t.tsyule.cn/hb1080814.html",
+        "https://mobile.tsyule.cn/index.php/index/share/tgid/hb1080814"
+      ]
+    },
+    "3": {
+      "name": "新版-浅蓝",
+      "url": "http://gh.dongyouxi666.com/index.php/Cpsbtgame/ghLandPage/page_type/3",
+      "promotion_links": [
+        "https://gweb.tsyule.cn/download-1-hb1080814.html",
+        "https://gweb.tsyule.cn/register-1-hb1080814.html"
+      ]
+    },
+    "5": {
+      "name": "精品游戏0.05起",
+      "url": "http://gh.dongyouxi666.com/index.php/Cpsbtgame/ghLandPage/page_type/5",
+      "promotion_links": [
+        "https://gweb.tsyule.cn/download-2-hb1080814.html",
+        "https://gweb.tsyule.cn/register-2-hb1080814.html"
+      ]
+    },
+    "7": {
+      "name": "0.1折真充",
+      "url": "http://gh.dongyouxi666.com/index.php/Cpsbtgame/ghLandPage/page_type/7",
+      "promotion_links": [
+        "https://gweb.tsyule.cn/download-4-hb1080814.html",
+        "https://gweb.tsyule.cn/register-4-hb1080814.html"
+      ]
+    },
+    "9": {
+      "name": "所有游戏都打折",
+      "url": "http://gh.dongyouxi666.com/index.php/Cpsbtgame/ghLandPage/page_type/9",
+      "promotion_links": [
+        "https://gweb.tsyule.cn/download-5-hb1080814.html",
+        "https://gweb.tsyule.cn/register-5-hb1080814.html"
+      ]
+    },
+    "11": {
+      "name": "免费版",
+      "url": "http://gh.dongyouxi666.com/index.php/Cpsbtgame/ghLandPage/page_type/11",
+      "promotion_links": [
+        "https://gweb.tsyule.cn/download-6-hb1080814.html",
+        "https://gweb.tsyule.cn/register-6-hb1080814.html"
+      ]
+    }
+  },
+  "promotion_types": {
+    "mobile_download_register": {
+      "name": "移动端-先下载后注册",
+      "url": "https://wap.tsyule.cn/hb1080814-7.html",
+      "desc": "移动端 WAP 推广链接"
+    },
+    "short_link": {
+      "name": "短链接",
+      "url": "https://t.tsyule.cn/hb1080814.html",
+      "desc": "短域名推广链接，便于分享"
+    },
+    "mobile_share": {
+      "name": "移动分享页",
+      "url": "https://mobile.tsyule.cn/index.php/index/share/tgid/hb1080814",
+      "desc": "移动端分享推广页面"
+    }
+  }
+}

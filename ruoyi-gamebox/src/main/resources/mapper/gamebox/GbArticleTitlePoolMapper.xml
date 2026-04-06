@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbArticleTitlePoolMapper">
+    
+    <resultMap type="GbArticleTitlePool" id="GbArticleTitlePoolResult">
+        <result property="id"    column="id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="title"    column="title"    />
+        <result property="keywords"    column="keywords"    />
+        <result property="referenceContent"    column="reference_content"    />
+        <result property="sourceName"    column="source_name"    />
+        <result property="sourceUrl"    column="source_url"    />
+        <result property="importBatch"    column="import_batch"    />
+        <result property="usageStatus"    column="usage_status"    />
+        <result property="usedCount"    column="used_count"    />
+        <result property="usedTime"    column="used_time"    />
+        <result property="usedArticleIds"    column="used_article_ids"    />
+        <result property="priority"    column="priority"    />
+        <result property="tags"    column="tags"    />
+        <result property="extraData"    column="extra_data"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+        <result property="relationSource"    column="relation_source"    />
+        <result property="isExcluded"    column="is_excluded"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categoryIcon"    column="category_icon"    />
+    </resultMap>
+
+    <!-- 通过JOIN批次表获取site_id和category_id -->
+    <sql id="selectGbArticleTitlePoolVo">
+        select t.id, b.site_id, b.category_id, t.title, t.keywords, t.reference_content, t.source_name, t.source_url, 
+               t.import_batch, t.usage_status, t.used_count, t.used_time, t.used_article_ids, 
+               t.priority, t.tags, t.extra_data, t.del_flag, 
+               t.create_by, t.create_time, t.update_by, t.update_time, t.remark,
+               c.name as category_name, c.icon as category_icon
+        from gb_title_pool t
+        left join gb_title_pool_batch b on t.import_batch COLLATE utf8mb4_unicode_ci = b.batch_code COLLATE utf8mb4_unicode_ci
+        left join gb_categories c on b.category_id = c.id and c.del_flag = '0'
+    </sql>
+
+    <select id="selectGbArticleTitlePoolList" parameterType="GbArticleTitlePool" resultMap="GbArticleTitlePoolResult">
+        <choose>
+            <!-- 创建者模式查询 -->
+            <when test="queryMode == 'creator'">
+                <include refid="selectGbArticleTitlePoolVo"/>
+                <where>  
+                    t.del_flag = '0'
+                    <!-- 站点过滤 -->
+                    <choose>
+                        <!-- 包含默认配置：查询指定网站创建的 + 默认配置 -->
+                        <when test="siteId != null and includeDefault != null and includeDefault == true and siteId > 0">
+                            and (b.site_id = #{siteId}<if test="params != null and params.personalSiteId != null"> OR b.site_id = #{params.personalSiteId}</if>)
+                        </when>
+                        <!-- 明确指定网站ID -->
+                        <when test="siteId != null and siteId > 0">
+                            and b.site_id = #{siteId}
+                        </when>
+                        <!-- siteId为null时，用personalSiteId兜底，否则返回空 -->
+                        <when test="params != null and params.personalSiteId != null">
+                            and b.site_id = #{params.personalSiteId}
+                        </when>
+                        <otherwise>
+                            and 1 = 0
+                        </otherwise>
+                    </choose>
+                    <if test="categoryId != null">and b.category_id = #{categoryId}</if>
+                    <if test="title != null  and title != ''"> and t.title like concat('%', #{title}, '%')</if>
+                    <if test="keywords != null  and keywords != ''"> and t.keywords like concat('%', #{keywords}, '%')</if>
+                    <if test="sourceName != null  and sourceName != ''"> and t.source_name like concat('%', #{sourceName}, '%')</if>
+                    <if test="importBatch != null  and importBatch != ''"> and t.import_batch = #{importBatch}</if>
+                    <if test="usageStatus != null  and usageStatus != ''"> and t.usage_status = #{usageStatus}</if>
+                    <if test="tags != null  and tags != ''"> and t.tags like concat('%', #{tags}, '%')</if>
+                </where>
+                order by t.priority desc, t.create_time desc
+            </when>
+            
+            <!-- 关联模式查询 -->
+            <when test="queryMode == 'related'">
+                SELECT
+                    t.id, b.site_id, b.category_id, t.title, t.keywords, t.reference_content, t.source_name, t.source_url,
+                    t.import_batch, t.usage_status, t.used_count, t.used_time, t.used_article_ids,
+                    t.priority, t.tags, t.extra_data, t.del_flag,
+                    t.create_by, t.create_time, t.update_by, t.update_time, t.remark,
+                    c.name as category_name,
+                    c.icon as category_icon,
+                    CASE 
+                        WHEN b.site_id = #{siteId} THEN 'own'
+                        WHEN b.site_id = #{params.personalSiteId} THEN 'default'
+                    END as relation_source,
+                    CASE 
+                        WHEN b.site_id = #{params.personalSiteId} THEN 
+                            (SELECT COUNT(1) FROM gb_site_title_pool_relations sr 
+                             WHERE sr.relation_type = 'exclude' 
+                             AND sr.title_pool_id = t.id 
+                             AND sr.site_id = #{siteId})
+                        ELSE NULL
+                    END as is_excluded
+                FROM gb_title_pool t
+                LEFT JOIN gb_title_pool_batch b ON t.import_batch COLLATE utf8mb4_unicode_ci = b.batch_code COLLATE utf8mb4_unicode_ci
+                LEFT JOIN gb_categories c ON b.category_id = c.id AND c.del_flag = '0'
+                <where>
+                    t.del_flag = '0'
+                    AND (
+                        <!-- 自有配置 -->
+                        b.site_id = #{siteId}
+                        <!-- 用户默认站点配置 -->
+                        <if test="params != null and params.personalSiteId != null">
+                            OR b.site_id = #{params.personalSiteId}
+                        </if>
+                    )
+                    <if test="categoryId != null">AND b.category_id = #{categoryId}</if>
+                    <if test="title != null and title != ''">AND t.title LIKE CONCAT('%', #{title}, '%')</if>
+                    <if test="keywords != null and keywords != ''">AND t.keywords LIKE CONCAT('%', #{keywords}, '%')</if>
+                    <if test="sourceName != null and sourceName != ''">AND t.source_name LIKE CONCAT('%', #{sourceName}, '%')</if>
+                    <if test="importBatch != null and importBatch != ''">AND t.import_batch = #{importBatch}</if>
+                    <if test="usageStatus != null and usageStatus != ''">AND t.usage_status = #{usageStatus}</if>
+                    <if test="tags != null and tags != ''">AND t.tags LIKE CONCAT('%', #{tags}, '%')</if>
+                </where>
+                ORDER BY t.priority DESC, t.create_time DESC
+            </when>
+            
+            <!-- 默认查询（通用查询，主要用于通过importBatch查询批次内的标题） -->
+            <otherwise>
+                <include refid="selectGbArticleTitlePoolVo"/>
+                <where>
+                    t.del_flag = '0'
+                    <if test="siteId != null">and b.site_id = #{siteId}</if>
+                    <if test="categoryId != null">and b.category_id = #{categoryId}</if>
+                    <if test="title != null and title != ''">and t.title like concat('%', #{title}, '%')</if>
+                    <if test="keywords != null and keywords != ''">and t.keywords like concat('%', #{keywords}, '%')</if>
+                    <if test="sourceName != null and sourceName != ''">and t.source_name like concat('%', #{sourceName}, '%')</if>
+                    <if test="importBatch != null and importBatch != ''">and t.import_batch = #{importBatch}</if>
+                    <if test="usageStatus != null and usageStatus != ''">and t.usage_status = #{usageStatus}</if>
+                    <if test="tags != null and tags != ''">and t.tags like concat('%', #{tags}, '%')</if>
+                </where>
+                order by t.priority desc, t.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+    
+    <select id="selectGbArticleTitlePoolById" parameterType="Long" resultMap="GbArticleTitlePoolResult">
+        <include refid="selectGbArticleTitlePoolVo"/>
+        where t.id = #{id}
+    </select>
+        
+    <insert id="insertGbArticleTitlePool" parameterType="GbArticleTitlePool" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_title_pool
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">title,</if>
+            <if test="keywords != null">keywords,</if>
+            <if test="referenceContent != null">reference_content,</if>
+            <if test="sourceName != null">source_name,</if>
+            <if test="sourceUrl != null">source_url,</if>
+            <if test="importBatch != null">import_batch,</if>
+            <if test="usageStatus != null">usage_status,</if>
+            <if test="usedCount != null">used_count,</if>
+            <if test="usedTime != null">used_time,</if>
+            <if test="usedArticleIds != null">used_article_ids,</if>
+            <if test="priority != null">priority,</if>
+            <if test="tags != null">tags,</if>
+            <if test="extraData != null">extra_data,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="keywords != null">#{keywords},</if>
+            <if test="referenceContent != null">#{referenceContent},</if>
+            <if test="sourceName != null">#{sourceName},</if>
+            <if test="sourceUrl != null">#{sourceUrl},</if>
+            <if test="importBatch != null">#{importBatch},</if>
+            <if test="usageStatus != null">#{usageStatus},</if>
+            <if test="usedCount != null">#{usedCount},</if>
+            <if test="usedTime != null">#{usedTime},</if>
+            <if test="usedArticleIds != null">#{usedArticleIds},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="tags != null">#{tags},</if>
+            <if test="extraData != null">#{extraData},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbArticleTitlePool" parameterType="GbArticleTitlePool">
+        update gb_title_pool
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="keywords != null">keywords = #{keywords},</if>
+            <if test="referenceContent != null">reference_content = #{referenceContent},</if>
+            <if test="sourceName != null">source_name = #{sourceName},</if>
+            <if test="sourceUrl != null">source_url = #{sourceUrl},</if>
+            <if test="importBatch != null">import_batch = #{importBatch},</if>
+            <if test="usageStatus != null">usage_status = #{usageStatus},</if>
+            <if test="usedCount != null">used_count = #{usedCount},</if>
+            <if test="usedTime != null">used_time = #{usedTime},</if>
+            <if test="usedArticleIds != null">used_article_ids = #{usedArticleIds},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="extraData != null">extra_data = #{extraData},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGbArticleTitlePoolById" parameterType="Long">
+        update gb_title_pool set del_flag = '2' where id = #{id}
+    </delete>
+
+    <delete id="deleteGbArticleTitlePoolByIds" parameterType="Long">
+        update gb_title_pool set del_flag = '2' where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkTitleExists" resultType="int">
+        select count(1) from gb_title_pool 
+        where title = #{title} and del_flag = '0'
+    </select>
+
+    <select id="countTotalTitles" resultType="int">
+        select count(1) from gb_title_pool where del_flag = '0'
+    </select>
+
+    <select id="countUsedTitles" resultType="int">
+        select count(1) from gb_title_pool 
+        where usage_status = '1' and del_flag = '0'
+    </select>
+
+    <select id="countUnusedTitles" resultType="int">
+        select count(1) from gb_title_pool 
+        where usage_status = '0' and del_flag = '0'
+    </select>
+
+    <select id="selectUnusedTitles" resultMap="GbArticleTitlePoolResult">
+        <include refid="selectGbArticleTitlePoolVo"/>
+        where usage_status = '0' and del_flag = '0'
+        order by priority desc, create_time desc
+        limit #{limit}
+    </select>
+
+    <update id="markTitleAsUsed">
+        update gb_title_pool
+        set usage_status = '1',
+            used_count = used_count + 1,
+            used_time = now(),
+            used_article_ids = CONCAT(IFNULL(used_article_ids, ''), IF(used_article_ids IS NULL OR used_article_ids = '', '', ','), #{articleId})
+        where id = #{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,65 @@
+{
+  "platform": "milu",
+  "crawl_time": "2026-03-05T15:35:17.639875",
+  "total_count": 454,
+  "items": [
+    {
+      "category": "0.1折游戏",
+      "discount_info": "0.1折",
+      "game_icon": "https://static-cdn.app.mysybt.com/admin-fast-system/gamedata/20260306/gameicon/icon6e156b53de7eedc19548843a358af4621772778869.gif",
+      "name_remark": "0.1折正版授权",
+      "has_profession_tag": true,
+      "game_name": "新不良人",
+      "game_genre": [
+        "卡牌",
+        "武侠"
+      ],
+      "support_platform": "安卓",
+      "release_time": "2026-04-23 08:00",
+      "android_download_link": "http://and.heigu.com/14793/4g5j/?t=1",
+      "ios_support": false,
+      "promotion_page_url": "https://webbox.heigu.com/#/game?id=17007&agent=4g5j",
+      "multi_function_link": "http://app.heigu.com/?a=4g5j&b=14793&c=1",
+      "material_package_url": "https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702",
+      "screenshots": [
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702&path=游戏素材/游戏截图/screenshotf979263ba3c63d570caf6665a8317d151772780713.jpg",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702&path=游戏素材/游戏截图/screenshotfa3e3b99e898bfde7e99807be335884b1772780712.jpg",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702&path=游戏素材/游戏截图/screenshotab7c7623b96b77f5429d5e00e8a1cb8e1772780712.jpg",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702&path=游戏素材/游戏截图/screenshot0dd537ae91c7152c80f86a2438e2bff11772780712.jpg",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702&path=游戏素材/游戏截图/screenshot2945cbbf5b10a848830c0126e7bd64131772780712.jpg",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702&path=游戏素材/游戏截图/screenshota9cafc305b13a35ba2f3b6f044d1d7a01772780711.jpg"
+      ],
+      "video_url": "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/xinbuliangrenshoukuan1zhebuliangren/xinbuliangrenshoukuan1zhebuliangren.zip?version=20260306151702&path=2026030614362250.mp4",
+      "game_id": "14793",
+      "is_profession": true
+    },
+    {
+      "category": "0.1折游戏",
+      "game_id": "14808",
+      "discount_info": "0.1折",
+      "game_icon": "https://static-cdn.app.mysybt.com/admin-fast-system/gamedata/20260304/gameicon/icon9effccb8815181214ded09755e10350f1772590312.gif",
+      "name_remark": "0.1疯狂送千抽删测",
+      "game_name": "军师联盟",
+      "game_genre": [
+        "卡牌",
+        "三国"
+      ],
+      "support_platform": "安卓",
+      "release_time": "2026-04-02 10:00",
+      "android_download_link": "http://and.heigu.com/14808/4g5j",
+      "ios_support": false,
+      "promotion_page_url": "https://webbox.heigu.com/#/game?id=17022&agent=4g5j",
+      "multi_function_link": "http://app.heigu.com/?a=4g5j&b=14808&c=1",
+      "material_package_url": "https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913",
+      "screenshots": [
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913&path=游戏素材/游戏截图/screenshote17304df6c56b308457506173141c0141772590466.png",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913&path=游戏素材/游戏截图/screenshotdb0fe1bf40407766d862cd50074e45321772590464.png",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913&path=游戏素材/游戏截图/screenshot4d0fbb68b733ad515033cb1de5ce73081772590465.png",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913&path=游戏素材/游戏截图/screenshotf5e245059f93c30f7bc8bae033ec3ac81772590466.png",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913&path=游戏素材/游戏截图/screenshot5a1688e142acbc93b2f75b5c1c85dbd51772590464.png",
+        "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913&path=游戏素材/游戏截图/screenshotd5535de9cbb6af6780fa1c8c4969b8c61772590465.png"
+      ],
+      "video_url": "https://unzip.zeusai.top/api/file?url=https://cdn1.oss.mysybt.com/games/junshilianmeng1zhefengkuangsongqianchou/junshilianmeng1zhefengkuangsongqianchou.zip?version=20260304142913&path=2026030410133128.mp4"
+    }
+  ]
+}

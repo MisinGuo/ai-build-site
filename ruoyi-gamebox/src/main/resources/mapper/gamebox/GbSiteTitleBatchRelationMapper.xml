@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteTitleBatchRelationMapper">
+    
+    <!-- 检查排除关联是否存在 -->
+    <select id="checkExcludeRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_title_batch_relations
+        WHERE site_id = #{siteId}
+        AND title_batch_id = #{batchId}
+        AND relation_type = 'exclude'
+    </select>
+    
+    <!-- 检查关联是否存在（include类型） -->
+    <select id="checkRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_title_batch_relations
+        WHERE site_id = #{siteId}
+        AND title_batch_id = #{batchId}
+        AND relation_type = 'include'
+    </select>
+    
+    <!-- 插入网站-标题池批次关联 -->
+    <insert id="insertGbSiteTitleBatchRelation" parameterType="GbSiteTitleBatchRelation">
+        INSERT INTO gb_site_title_batch_relations (
+            site_id,
+            title_batch_id,
+            relation_type,
+            is_visible,
+            create_by,
+            create_time
+        ) VALUES (
+            #{siteId},
+            #{titleBatchId},
+            #{relationType},
+            #{isVisible},
+            #{createBy},
+            #{createTime}
+        )
+    </insert>
+    
+    <!-- 插入网站关联 -->
+    <insert id="insertSiteRelation" parameterType="GbSiteRelation">
+        INSERT INTO gb_site_title_batch_relations (
+            site_id,
+            title_batch_id,
+            relation_type,
+            is_visible,
+            create_by,
+            create_time
+        ) VALUES (
+            #{siteId},
+            #{relatedId},
+            #{relationType},
+            CASE WHEN #{relationType} = 'shared' THEN '1' ELSE '0' END,
+            #{createBy},
+            #{createTime}
+        )
+    </insert>
+    
+    <!-- 批量插入网站关联 -->
+    <insert id="batchInsertSiteRelations">
+        INSERT INTO gb_site_title_batch_relations (
+            site_id,
+            title_batch_id,
+            relation_type,
+            is_visible,
+            create_by,
+            create_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.siteId},
+                #{item.relatedId},
+                #{item.relationType},
+                CASE WHEN #{item.relationType} = 'shared' THEN '1' ELSE '0' END,
+                #{item.createBy},
+                #{item.createTime}
+            )
+        </foreach>
+    </insert>
+    
+    <!-- 删除网站关联 -->
+    <delete id="deleteSiteRelation">
+        DELETE FROM gb_site_title_batch_relations
+        WHERE site_id = #{siteId}
+        AND title_batch_id = #{batchId}
+        <if test="relationType != null and relationType != ''">
+            AND relation_type = #{relationType}
+        </if>
+    </delete>
+    
+    <!-- 查询批次的所有网站关联关系（含 relation_type） -->
+    <select id="selectSitesByBatchId" resultMap="GbSiteTitleBatchRelationResult">
+        SELECT id, site_id, title_batch_id, relation_type, is_visible, create_by, create_time
+        FROM gb_site_title_batch_relations
+        WHERE title_batch_id = #{batchId}
+    </select>
+
+    <!-- 查询被排除的网站ID列表 -->
+    <select id="selectExcludedSiteIdsByRelationType" resultType="Long">
+        SELECT site_id
+        FROM gb_site_title_batch_relations
+        WHERE title_batch_id = #{batchId}
+        <if test="relationType != null and relationType != ''">
+            AND relation_type = #{relationType}
+        </if>
+    </select>
+    
+    <!-- 结果映射 -->
+    <resultMap id="GbSiteTitleBatchRelationResult" type="GbSiteTitleBatchRelation">
+        <id property="id" column="id"/>
+        <result property="siteId" column="site_id"/>
+        <result property="titleBatchId" column="title_batch_id"/>
+        <result property="relationType" column="relation_type"/>
+        <result property="isVisible" column="is_visible"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+    
+    <!-- 查询网站-标题池批次关联列表 -->
+    <select id="selectGbSiteTitleBatchRelationList" parameterType="GbSiteTitleBatchRelation" resultMap="GbSiteTitleBatchRelationResult">
+        SELECT id, site_id, title_batch_id, relation_type, is_visible, create_by, create_time
+        FROM gb_site_title_batch_relations
+        <where>
+            <if test="siteId != null">
+                AND site_id = #{siteId}
+            </if>
+            <if test="titleBatchId != null">
+                AND title_batch_id = #{titleBatchId}
+            </if>
+            <if test="relationType != null and relationType != ''">
+                AND relation_type = #{relationType}
+            </if>
+        </where>
+    </select>
+    
+    <!-- 更新网站-标题池批次关联 -->
+    <update id="updateGbSiteTitleBatchRelation" parameterType="GbSiteTitleBatchRelation">
+        UPDATE gb_site_title_batch_relations
+        <set>
+            <if test="isVisible != null">
+                is_visible = #{isVisible},
+            </if>
+            <if test="relationType != null and relationType != ''">
+                relation_type = #{relationType},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 批量插入标题池批次网站关联（ON DUPLICATE KEY UPDATE 保障幂等） -->
+    <insert id="batchInsertGbSiteTitleBatchRelations">
+        INSERT INTO gb_site_title_batch_relations (site_id, title_batch_id, relation_type, is_visible, create_by, create_time)
+        VALUES
+        <foreach collection="relations" item="item" separator=",">
+            (#{item.siteId}, #{item.titleBatchId}, #{item.relationType}, #{item.isVisible}, #{item.createBy}, #{item.createTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            relation_type = VALUES(relation_type),
+            is_visible = VALUES(is_visible),
+            update_time = NOW()
+    </insert>
+
+    <!-- 批量删除：对给定 batchIds+relationType，删除不在 keepSiteIds 中的网站关联 -->
+    <delete id="deleteByBatchIdsAndTypeExcluding">
+        DELETE FROM gb_site_title_batch_relations
+        WHERE title_batch_id IN
+        <foreach collection="batchIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+        AND relation_type = #{relationType}
+        <if test="keepSiteIds != null and keepSiteIds.size() &gt; 0">
+        AND site_id NOT IN
+        <foreach collection="keepSiteIds" item="sid" open="(" separator="," close=")">#{sid}</foreach>
+        </if>
+    </delete>
+
+</mapper>

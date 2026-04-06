@@ -1,0 +1,46 @@
+import type { SitemapConfig } from '@/lib/sitemap/types'
+
+/**
+ * Sitemap 配置
+ */
+export const sitemapConfig: SitemapConfig = {
+  // 允许的域名白名单（防止内容被盗用）
+  allowedHosts: [
+    '*.94kj.cn',          // 所有 5awyx.com 子域名
+    'localhost:3000',
+    'localhost:8788', // Cloudflare Workers 本地开发
+  ],
+  // 默认域名（当请求来自非白名单域名时使用）
+  defaultHostname: 'https://kapai-web.94kj.cn',
+  // 单个 sitemap 文件最多包含 50,000 个 URL (Google 限制)
+  maxUrlsPerSitemap: 50000,
+  
+  // 各内容类型的默认配置
+  contentTypes: {
+    // 静态页面：首页、列表页等
+    static: {
+      changefreq: 'daily',
+      priority: 1.0,
+    },
+    // 攻略文章（guides）
+    guides: {
+      changefreq: 'weekly',
+      priority: 0.7,
+    },
+    // 评测文章（reviews）
+    reviews: {
+      changefreq: 'weekly',
+      priority: 0.7,
+    },
+    // 游戏列表页、详情页、分类页
+    games: {
+      changefreq: 'weekly',
+      priority: 0.8,
+    },
+    // 游戏盒子列表页、详情页、下载页
+    boxes: {
+      changefreq: 'weekly',
+      priority: 0.8,
+    },
+  },
+}

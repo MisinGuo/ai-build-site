@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbImportBatchMapper">
+
+    <resultMap type="com.ruoyi.gamebox.domain.GbImportBatch" id="GbImportBatchResult">
+        <result property="id"            column="id"             />
+        <result property="batchNo"       column="batch_no"       />
+        <result property="boxId"         column="box_id"         />
+        <result property="boxName"       column="box_name"       />
+        <result property="siteId"        column="site_id"        />
+        <result property="siteName"      column="site_name"      />
+        <result property="platformType"  column="platform_type"  />
+        <result property="totalCount"    column="total_count"    />
+        <result property="newCount"      column="new_count"      />
+        <result property="updatedCount"  column="updated_count"  />
+        <result property="skippedCount"  column="skipped_count"  />
+        <result property="failedCount"   column="failed_count"   />
+        <result property="status"        column="status"         />
+        <result property="summary"       column="summary"        />
+        <result property="reverted"      column="reverted"       />
+        <result property="createTime"    column="create_time"    />
+        <result property="createBy"      column="create_by"      />
+    </resultMap>
+
+    <sql id="selectCols">
+        id, batch_no, box_id, box_name, site_id, site_name, platform_type,
+        total_count, new_count, updated_count, skipped_count, failed_count,
+        status, summary, reverted, create_time, create_by
+    </sql>
+
+    <select id="selectById" parameterType="Long" resultMap="GbImportBatchResult">
+        SELECT <include refid="selectCols"/> FROM gb_import_batch WHERE id = #{id}
+    </select>
+
+    <select id="selectByBatchNo" parameterType="String" resultMap="GbImportBatchResult">
+        SELECT <include refid="selectCols"/> FROM gb_import_batch WHERE batch_no = #{batchNo}
+    </select>
+
+    <select id="selectList" parameterType="com.ruoyi.gamebox.domain.GbImportBatch" resultMap="GbImportBatchResult">
+        SELECT * FROM (
+            SELECT <include refid="selectCols"/>
+            FROM gb_import_batch b
+            <where>
+                <if test="boxId != null">AND b.box_id = #{boxId}</if>
+                <if test="siteId != null">AND b.site_id = #{siteId}</if>
+                <if test="status != null and status != ''">AND b.status = #{status}</if>
+                <if test="reverted != null">AND b.reverted = #{reverted}</if>
+                <if test="platformType != null and platformType != ''">AND b.platform_type = #{platformType}</if>
+                <if test="batchNos != null and batchNos != ''">
+                    AND FIND_IN_SET(b.batch_no, #{batchNos}) &gt; 0
+                </if>
+                <if test="gameName != null and gameName != ''">
+                    AND EXISTS (
+                        SELECT 1 FROM gb_game_change_log c
+                        WHERE c.batch_id = b.id
+                          AND c.game_name LIKE CONCAT('%', #{gameName}, '%')
+                    )
+                </if>
+            </where>
+
+            UNION ALL
+
+            SELECT
+                -MAX(c.id) AS id,
+                c.batch_no AS batch_no,
+                NULL AS box_id,
+                '手工修改' AS box_name,
+                NULL AS site_id,
+                '手工修改' AS site_name,
+                'manual' AS platform_type,
+                COUNT(1) AS total_count,
+                SUM(CASE WHEN c.change_type = 'INSERT' THEN 1 ELSE 0 END) AS new_count,
+                SUM(CASE WHEN c.change_type = 'UPDATE' THEN 1 ELSE 0 END) AS updated_count,
+                0 AS skipped_count,
+                0 AS failed_count,
+                'manual' AS status,
+                NULL AS summary,
+                CASE WHEN SUM(CASE WHEN IFNULL(c.reverted, 0) = 0 THEN 1 ELSE 0 END) = 0 THEN 1 ELSE 0 END AS reverted,
+                MAX(c.create_time) AS create_time,
+                MAX(c.create_by) AS create_by
+            FROM gb_game_change_log c
+            <where>
+                c.batch_id IS NULL
+                AND c.batch_no IS NOT NULL
+                AND c.batch_no != ''
+                <if test="boxId != null">AND 1 = 0</if>
+                <if test="siteId != null">AND 1 = 0</if>
+                <if test="status != null and status != ''">AND #{status} = 'manual'</if>
+                <if test="platformType != null and platformType != ''">AND #{platformType} = 'manual'</if>
+                <if test="batchNos != null and batchNos != ''">
+                    AND FIND_IN_SET(c.batch_no, #{batchNos}) &gt; 0
+                </if>
+                <if test="gameName != null and gameName != ''">
+                    AND c.game_name LIKE CONCAT('%', #{gameName}, '%')
+                </if>
+            </where>
+            GROUP BY c.batch_no
+            <if test="reverted != null">
+                HAVING CASE WHEN SUM(CASE WHEN IFNULL(c.reverted, 0) = 0 THEN 1 ELSE 0 END) = 0 THEN 1 ELSE 0 END = #{reverted}
+            </if>
+        ) t
+        ORDER BY t.create_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.ruoyi.gamebox.domain.GbImportBatch" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gb_import_batch (
+            batch_no, box_id, box_name, site_id, site_name, platform_type,
+            total_count, new_count, updated_count, skipped_count, failed_count,
+            status, summary, reverted, create_time, create_by
+        ) VALUES (
+            #{batchNo}, #{boxId}, #{boxName}, #{siteId}, #{siteName}, #{platformType},
+            #{totalCount}, #{newCount}, #{updatedCount}, #{skippedCount}, #{failedCount},
+            #{status}, #{summary}, 0, #{createTime}, #{createBy}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.ruoyi.gamebox.domain.GbImportBatch">
+        UPDATE gb_import_batch
+        <set>
+            <if test="totalCount != null">total_count   = #{totalCount},</if>
+            <if test="newCount != null">new_count      = #{newCount},</if>
+            <if test="updatedCount != null">updated_count = #{updatedCount},</if>
+            <if test="skippedCount != null">skipped_count = #{skippedCount},</if>
+            <if test="failedCount != null">failed_count  = #{failedCount},</if>
+            <if test="status != null">status         = #{status},</if>
+            <if test="summary != null">summary        = #{summary},</if>
+            <if test="reverted != null">reverted       = #{reverted},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <update id="markReverted">
+        UPDATE gb_import_batch SET reverted = 1 WHERE id = #{id}
+    </update>
+
+</mapper>

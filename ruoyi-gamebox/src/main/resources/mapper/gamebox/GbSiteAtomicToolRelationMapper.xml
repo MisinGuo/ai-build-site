@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteAtomicToolRelationMapper">
+    
+    <resultMap type="GbSiteAtomicToolRelation" id="GbSiteAtomicToolRelationResult">
+        <result property="id"    column="id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="atomicToolId"    column="tool_id"    />
+        <result property="relationType"    column="relation_type"    />
+        <result property="isVisible"    column="is_visible"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="siteName"    column="site_name"    />
+        <result property="toolName"    column="tool_name"    />
+    </resultMap>
+
+    <!-- 查询网站的所有原子工具 -->
+    <select id="selectAtomicToolsBySiteId" resultMap="GbSiteAtomicToolRelationResult">
+        SELECT 
+            r.id,
+            r.site_id,
+            r.tool_id,
+            r.relation_type,
+            r.is_visible,
+            r.create_by,
+            r.create_time,
+            r.update_by,
+            r.update_time,
+            s.name as site_name,
+            t.tool_name as tool_name
+        FROM gb_site_atomic_tool_relations r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        LEFT JOIN gb_atomic_tool t ON r.tool_id = t.id
+        WHERE r.site_id = #{siteId}
+        ORDER BY r.id
+    </select>
+
+    <!-- 查询原子工具在哪些网站可用 -->
+    <select id="selectSitesByAtomicToolId" resultMap="GbSiteAtomicToolRelationResult">
+        SELECT 
+            r.id,
+            r.site_id,
+            r.tool_id,
+            r.relation_type,
+            r.is_visible,
+            r.create_by,
+            r.create_time,
+            r.update_by,
+            r.update_time,
+            s.name as site_name,
+            t.tool_name as tool_name
+        FROM gb_site_atomic_tool_relations r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        LEFT JOIN gb_atomic_tool t ON r.tool_id = t.id
+        WHERE r.tool_id = #{atomicToolId}
+        ORDER BY r.id
+    </select>
+
+    <!-- 检查关联是否存在（include类型） -->
+    <select id="checkRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_atomic_tool_relations
+        WHERE site_id = #{siteId} 
+          AND tool_id = #{atomicToolId}
+          AND relation_type = 'include'
+    </select>
+    
+    <!-- 检查排除关联是否存在 -->
+    <select id="checkExcludeRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_atomic_tool_relations
+        WHERE site_id = #{siteId} 
+          AND tool_id = #{atomicToolId}
+          AND relation_type = 'exclude'
+    </select>
+
+    <!-- 新增关联 -->
+    <insert id="insertSiteAtomicToolRelation" parameterType="GbSiteAtomicToolRelation">
+        INSERT INTO gb_site_atomic_tool_relations (
+            site_id,
+            tool_id,
+            relation_type,
+            is_visible,
+            create_by,
+            create_time
+        ) VALUES (
+            #{siteId},
+            #{atomicToolId},
+            #{relationType},
+            #{isVisible},
+            #{createBy},
+            #{createTime}
+        )
+    </insert>
+
+    <!-- 批量新增关联 -->
+    <insert id="batchInsertSiteAtomicToolRelations" parameterType="java.util.List">
+        INSERT INTO gb_site_atomic_tool_relations (
+            site_id,
+            tool_id,
+            relation_type,
+            is_visible,
+            create_by,
+            create_time
+        ) VALUES
+        <foreach collection="relations" item="item" separator=",">
+            (
+                #{item.siteId},
+                #{item.atomicToolId},
+                #{item.relationType},
+                #{item.isVisible},
+                #{item.createBy},
+                #{item.createTime}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            relation_type = VALUES(relation_type),
+            is_visible = VALUES(is_visible),
+            update_time = NOW()
+    </insert>
+
+    <!-- 更新关联 -->
+    <update id="updateGbSiteAtomicToolRelation" parameterType="GbSiteAtomicToolRelation">
+        UPDATE gb_site_atomic_tool_relations
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="relationType != null">relation_type = #{relationType},</if>
+            <if test="isVisible != null">is_visible = #{isVisible},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        WHERE site_id = #{siteId} AND tool_id = #{atomicToolId}
+    </update>
+
+    <!-- 删除关联（支持按类型删除） -->
+    <delete id="deleteGbSiteAtomicToolRelation">
+        DELETE FROM gb_site_atomic_tool_relations
+        WHERE site_id = #{siteId} 
+          AND tool_id = #{atomicToolId}
+        <if test="relationType != null and relationType != ''">
+          AND relation_type = #{relationType}
+        </if>
+    </delete>
+    
+    <!-- 更新原子工具可见性 -->
+    <update id="updateSiteAtomicToolVisibility" parameterType="map">
+        UPDATE gb_site_atomic_tool_relations
+        SET is_visible = #{isVisible},
+            update_by = #{updateBy},
+            update_time = #{updateTime}
+        WHERE site_id = #{siteId}
+          AND tool_id = #{atomicToolId}
+    </update>
+    
+    <!-- 查询默认原子工具被哪些网站排除（按关联类型） -->
+    <select id="selectExcludedSiteIdsByRelationType" resultType="java.lang.Long">
+        SELECT site_id
+        FROM gb_site_atomic_tool_relations
+        WHERE tool_id = #{atomicToolId}
+          AND relation_type = #{relationType}
+        ORDER BY site_id
+    </select>
+
+    <!-- 批量删除：对给定 atomicToolIds+relationType，删除不在 keepSiteIds 中的网站关联 -->
+    <delete id="deleteByAtomicToolIdsAndTypeExcluding">
+        DELETE FROM gb_site_atomic_tool_relations
+        WHERE tool_id IN
+        <foreach collection="atomicToolIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+        AND relation_type = #{relationType}
+        <if test="keepSiteIds != null and keepSiteIds.size() &gt; 0">
+        AND site_id NOT IN
+        <foreach collection="keepSiteIds" item="sid" open="(" separator="," close=")">#{sid}</foreach>
+        </if>
+    </delete>
+
+</mapper>

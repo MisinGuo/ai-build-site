@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteAiPlatformRelationMapper">
+    
+    <resultMap type="GbSiteAiPlatformRelation" id="GbSiteAiPlatformRelationResult">
+        <result property="id"    column="id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="aiPlatformId"    column="ai_platform_id"    />
+        <result property="relationType"    column="relation_type"    />
+        <result property="isVisible"    column="is_visible"    />
+        <result property="isEditable"    column="is_editable"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="siteName"    column="site_name"    />
+        <result property="platformName"    column="platform_name"    />
+    </resultMap>
+
+    <!-- 查询网站的所有AI平台配置 -->
+    <select id="selectAiPlatformsBySiteId" resultMap="GbSiteAiPlatformRelationResult">
+        SELECT 
+            r.id,
+            r.site_id,
+            r.ai_platform_id,
+            r.relation_type,
+            r.is_visible,
+            r.is_editable,
+            r.sort_order,
+            r.create_by,
+            r.create_time,
+            r.update_by,
+            r.update_time,
+            s.name as site_name,
+            p.name as platform_name
+        FROM gb_site_ai_platform_relations r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        LEFT JOIN gb_ai_platforms p ON r.ai_platform_id = p.id
+        WHERE r.site_id = #{siteId}
+        ORDER BY r.sort_order, r.id
+    </select>
+
+    <!-- 查询AI平台配置在哪些网站可用 -->
+    <select id="selectSitesByAiPlatformId" resultMap="GbSiteAiPlatformRelationResult">
+        SELECT 
+            r.id,
+            r.site_id,
+            r.ai_platform_id,
+            r.relation_type,
+            r.is_visible,
+            r.is_editable,
+            r.sort_order,
+            r.create_by,
+            r.create_time,
+            r.update_by,
+            r.update_time,
+            s.name as site_name,
+            p.name as platform_name
+        FROM gb_site_ai_platform_relations r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        LEFT JOIN gb_ai_platforms p ON r.ai_platform_id = p.id
+        WHERE r.ai_platform_id = #{aiPlatformId}
+        ORDER BY r.sort_order, r.id
+    </select>
+
+    <!-- 检查关联是否存在 -->
+    <select id="checkRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_ai_platform_relations
+        WHERE site_id = #{siteId} AND ai_platform_id = #{aiPlatformId}
+    </select>
+
+    <!-- 检查关联关系是否存在（只检查include类型） -->
+    <select id="checkIncludeRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_ai_platform_relations
+        WHERE site_id = #{siteId} 
+          AND ai_platform_id = #{aiPlatformId}
+          AND relation_type = 'include'
+    </select>
+
+    <!-- 检查排除关联是否存在 -->
+    <select id="checkExcludeRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_ai_platform_relations
+        WHERE site_id = #{siteId} 
+          AND ai_platform_id = #{aiPlatformId}
+          AND relation_type = 'exclude'
+    </select>
+
+    <!-- 新增关联 -->
+    <insert id="insertGbSiteAiPlatformRelation" parameterType="GbSiteAiPlatformRelation">
+        INSERT INTO gb_site_ai_platform_relations (
+            site_id,
+            ai_platform_id,
+            relation_type,
+            is_visible,
+            is_editable,
+            sort_order,
+            create_by,
+            create_time
+        ) VALUES (
+            #{siteId},
+            #{aiPlatformId},
+            #{relationType},
+            #{isVisible},
+            #{isEditable},
+            #{sortOrder},
+            #{createBy},
+            #{createTime}
+        )
+    </insert>
+
+    <!-- 批量新增关联 -->
+    <insert id="batchInsertGbSiteAiPlatformRelation" parameterType="java.util.List">
+        INSERT INTO gb_site_ai_platform_relations (
+            site_id,
+            ai_platform_id,
+            relation_type,
+            is_visible,
+            is_editable,
+            sort_order,
+            create_by,
+            create_time
+        ) VALUES
+        <foreach collection="relations" item="item" separator=",">
+            (
+                #{item.siteId},
+                #{item.aiPlatformId},
+                #{item.relationType},
+                #{item.isVisible},
+                #{item.isEditable},
+                #{item.sortOrder},
+                #{item.createBy},
+                #{item.createTime}
+            )
+        </foreach>
+        ON DUPLICATE KEY UPDATE
+            relation_type = VALUES(relation_type),
+            is_visible = VALUES(is_visible),
+            is_editable = VALUES(is_editable),
+            update_time = NOW()
+    </insert>
+
+    <!-- 更新关联 -->
+    <update id="updateGbSiteAiPlatformRelation" parameterType="GbSiteAiPlatformRelation">
+        UPDATE gb_site_ai_platform_relations
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="relationType != null">relation_type = #{relationType},</if>
+            <if test="isVisible != null">is_visible = #{isVisible},</if>
+            <if test="isEditable != null">is_editable = #{isEditable},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        WHERE site_id = #{siteId} AND ai_platform_id = #{aiPlatformId}
+    </update>
+
+    <!-- 删除关联（支持按类型删除） -->
+    <delete id="deleteGbSiteAiPlatformRelation">
+        DELETE FROM gb_site_ai_platform_relations
+        WHERE site_id = #{siteId} AND ai_platform_id = #{aiPlatformId}
+        <if test="relationType != null and relationType != ''">
+            AND relation_type = #{relationType}
+        </if>
+    </delete>
+    
+    <!-- 查询默认AI平台配置被哪些网站排除 -->
+    <select id="selectExcludedSiteIds" resultType="java.lang.Long">
+        SELECT site_id
+        FROM gb_site_ai_platform_relations
+        WHERE ai_platform_id = #{aiPlatformId}
+          AND relation_type = 'exclude'
+        ORDER BY site_id
+    </select>
+    
+    <!-- 批量删除排除关联 -->
+    <delete id="batchDeleteExcludeRelations">
+        DELETE FROM gb_site_ai_platform_relations
+        WHERE ai_platform_id = #{aiPlatformId}
+          AND relation_type = 'exclude'
+          AND site_id IN
+          <foreach collection="siteIds" item="siteId" open="(" separator="," close=")">
+              #{siteId}
+          </foreach>
+    </delete>
+    
+    <!-- 更新AI平台配置的可见性 -->
+    <update id="updateSiteAiPlatformVisibility" parameterType="java.util.Map">
+        UPDATE gb_site_ai_platform_relations
+        SET is_visible = #{isVisible},
+            update_by = #{updateBy},
+            update_time = #{updateTime}
+        WHERE site_id = #{siteId}
+          AND ai_platform_id = #{aiPlatformId}
+    </update>
+    
+    <!-- 批量删除：对给定 aiPlatformIds+relationType，删除不在 keepSiteIds 中的网站关联 -->
+    <delete id="deleteByAiPlatformIdsAndTypeExcluding">
+        DELETE FROM gb_site_ai_platform_relations
+        WHERE ai_platform_id IN
+        <foreach collection="aiPlatformIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+        AND relation_type = #{relationType}
+        <if test="keepSiteIds != null and keepSiteIds.size() &gt; 0">
+        AND site_id NOT IN
+        <foreach collection="keepSiteIds" item="sid" open="(" separator="," close=")">#{sid}</foreach>
+        </if>
+    </delete>
+
+</mapper>

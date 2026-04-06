@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbTitlePoolBatchMapper">
+    
+    <resultMap type="GbTitlePoolBatch" id="GbTitlePoolBatchResult">
+        <result property="id"    column="id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="batchCode"    column="batch_code"    />
+        <result property="batchName"    column="batch_name"    />
+        <result property="importDate"    column="import_date"    />
+        <result property="importSource"    column="import_source"    />
+        <result property="titleCount"    column="title_count"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="status"    column="status"    />
+        <result property="isExcluded"    column="is_excluded"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="siteName"    column="site_name"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categoryIcon"    column="category_icon"    />
+        <result property="relationSource"    column="relation_source"    />
+        <result property="isVisible"    column="is_visible"    />
+        <result property="relatedSitesCount" column="related_sites_count" />
+        <result property="excludedSitesCount" column="excluded_sites_count" />
+    </resultMap>
+
+    <resultMap id="BatchSiteRelationResult" type="java.util.HashMap">
+        <result column="site_id" property="siteId"/>
+        <result column="is_visible" property="isVisible"/>
+        <result column="site_name" property="siteName"/>
+        <result column="site_code" property="siteCode"/>
+        <result column="site_domain" property="siteDomain"/>
+        <result column="relation_type" property="relationType"/>
+    </resultMap>
+
+    <sql id="selectGbTitlePoolBatchVo">
+        SELECT 
+            b.id, b.site_id, b.batch_code, b.batch_name, b.import_date,
+            b.import_source, b.title_count, b.category_id, b.status, b.is_excluded, b.remark,
+            b.create_by, b.create_time, b.update_by, b.update_time,
+            COALESCE(s.name, CAST(b.site_id AS CHAR)) as site_name,
+            c.name as category_name
+        FROM gb_title_pool_batch b
+        LEFT JOIN gb_sites s ON b.site_id = s.id
+        LEFT JOIN gb_categories c ON b.category_id = c.id
+    </sql>
+
+    <select id="selectGbTitlePoolBatchList" parameterType="GbTitlePoolBatch" resultMap="GbTitlePoolBatchResult">
+        <!-- 关联模式：查询网站可见的标题池批次 -->
+        <if test="queryMode != null and queryMode == 'related' and siteId != null and siteId > 0">
+                SELECT b.id, b.site_id, b.batch_code, b.batch_name, b.import_date,
+                       b.import_source, b.title_count, b.category_id, b.status, b.remark,
+                       b.create_by, b.create_time, b.update_by, b.update_time,
+                       COALESCE(s.name, CAST(b.site_id AS CHAR)) as site_name,
+                       c.name as category_name,
+                       c.icon as category_icon,
+                       -- 统一的可见性状态：
+                       -- 1. 网站自己的批次：使用批次本身的status
+                       -- 2. 用户默认站点配置：
+                       --    - 如果有关联记录（incl.id不为空），使用关联表的is_visible（忽略排除逻辑）
+                       --    - 如果没有关联记录，使用排除逻辑（有excl记录则不可见，否则可见）
+                       -- 3. 其他网站批次：使用关联表的is_visible（必须有关联记录才能访问）
+                       CASE 
+                           WHEN b.site_id = #{siteId} THEN b.status
+                           WHEN b.site_id = #{params.personalSiteId} THEN 
+                               (CASE 
+                                   WHEN incl.id IS NOT NULL THEN incl.is_visible
+                                   WHEN excl.id IS NULL THEN '1' 
+                                   ELSE '0' 
+                               END)
+                           ELSE IFNULL(incl.is_visible, '0')
+                       END as is_visible,
+                       -- 关联来源标识：own(自己的) | default(默认配置) | shared(其他网站分享)
+                       CASE 
+                           WHEN b.site_id = #{siteId} THEN 'own'
+                           WHEN b.site_id = #{params.personalSiteId} THEN 'default'
+                           ELSE 'shared'
+                       END as relation_source,
+                       -- 是否被排除（仅对默认配置且无关联记录时有效）
+                       CASE WHEN b.site_id = #{params.personalSiteId} AND incl.id IS NULL AND excl.id IS NOT NULL THEN '1' ELSE '0' END as is_excluded,
+                       -- 关联的网站数量
+                       (SELECT COUNT(*) FROM gb_site_title_batch_relations r 
+                        WHERE r.title_batch_id = b.id AND r.relation_type = 'include') as related_sites_count,
+                       -- 排除的网站数量
+                       (SELECT COUNT(*) FROM gb_site_title_batch_relations r 
+                        WHERE r.title_batch_id = b.id AND r.relation_type = 'exclude') as excluded_sites_count
+                FROM gb_title_pool_batch b
+                LEFT JOIN gb_sites s ON b.site_id = s.id
+                LEFT JOIN gb_categories c ON b.category_id = c.id
+                -- 左连接正向关联（include）
+                LEFT JOIN gb_site_title_batch_relations incl 
+                    ON b.id = incl.title_batch_id 
+                    AND incl.site_id = #{siteId} 
+                    AND incl.relation_type = 'include'
+                -- 左连接排除关联（exclude）
+                LEFT JOIN gb_site_title_batch_relations excl 
+                    ON b.id = excl.title_batch_id 
+                    AND excl.site_id = #{siteId} 
+                    AND excl.relation_type = 'exclude'
+                <where>
+                    <!-- 三种配置来源：
+                         1. own: 网站自己创建的批次 (site_id = 当前网站)
+                         2. default: 全局默认配置 (site_id = 0)
+                         3. shared: 其他网站的批次 (通过shared关联)
+                    -->
+                    AND (
+                        b.site_id = #{siteId}
+                        <if test="params != null and params.personalSiteId != null">
+                            OR b.site_id = #{params.personalSiteId}
+                        </if>
+                        OR (b.site_id != #{siteId}
+                            <if test="params != null and params.personalSiteId != null">
+                                AND b.site_id != #{params.personalSiteId}
+                            </if>
+                            AND incl.id IS NOT NULL)
+                    )
+                    <if test="batchCode != null and batchCode != ''">AND b.batch_code = #{batchCode}</if>
+                    <if test="batchName != null and batchName != ''">AND b.batch_name LIKE CONCAT('%', #{batchName}, '%')</if>
+                    <if test="params.beginImportDate != null and params.beginImportDate != '' and params.endImportDate != null and params.endImportDate != ''">
+                        AND b.import_date BETWEEN #{params.beginImportDate} AND #{params.endImportDate}
+                    </if>
+                    <if test="importSource != null and importSource != ''">AND b.import_source = #{importSource}</if>
+                    <if test="categoryId != null">AND b.category_id = #{categoryId}</if>
+                    <if test="status != null and status != ''">AND b.status = #{status}</if>
+                </where>
+                ORDER BY b.site_id, b.import_date DESC, b.id DESC
+        </if>
+        
+        <!-- 创建者模式：查询指定创建者的标题池批次（默认模式） -->
+        <if test="queryMode == null or queryMode == 'creator'">
+                SELECT b.id, b.site_id, b.batch_code, b.batch_name, b.import_date,
+                       b.import_source, b.title_count, b.category_id, b.status, b.is_excluded, b.remark,
+                       b.create_by, b.create_time, b.update_by, b.update_time,
+                       COALESCE(s.name, CAST(b.site_id AS CHAR)) as site_name,
+                       c.name as category_name,
+                       c.icon as category_icon,
+                       (SELECT COUNT(*) FROM gb_site_title_batch_relations r 
+                        WHERE r.title_batch_id = b.id AND r.relation_type = 'include') as related_sites_count,
+                       (SELECT COUNT(*) FROM gb_site_title_batch_relations r 
+                        WHERE r.title_batch_id = b.id AND r.relation_type = 'exclude') as excluded_sites_count
+                FROM gb_title_pool_batch b
+                LEFT JOIN gb_sites s ON b.site_id = s.id
+                LEFT JOIN gb_categories c ON b.category_id = c.id
+                <where>
+                    <choose>
+                        <!-- 包含默认配置：查询指定网站创建的 + 默认配置 -->
+                        <when test="siteId != null and includeDefault != null and includeDefault == true and siteId > 0">
+                            (b.site_id = #{siteId}<if test="params != null and params.personalSiteId != null"> OR b.site_id = #{params.personalSiteId}</if>)
+                        </when>
+                        <!-- 明确指定网站ID -->
+                        <when test="siteId != null and siteId > 0">
+                            b.site_id = #{siteId}
+                        </when>
+                        <!-- siteId为null时，用personalSiteId兜底，否则返回空 -->
+                        <when test="params != null and params.personalSiteId != null">
+                            b.site_id = #{params.personalSiteId}
+                        </when>
+                        <otherwise>
+                            1 = 0
+                        </otherwise>
+                    </choose>
+                    <if test="batchCode != null and batchCode != ''">AND b.batch_code = #{batchCode}</if>
+                    <if test="batchName != null and batchName != ''">AND b.batch_name LIKE CONCAT('%', #{batchName}, '%')</if>
+                    <if test="params.beginImportDate != null and params.beginImportDate != '' and params.endImportDate != null and params.endImportDate != ''">
+                        AND b.import_date BETWEEN #{params.beginImportDate} AND #{params.endImportDate}
+                    </if>
+                    <if test="importSource != null and importSource != ''">AND b.import_source = #{importSource}</if>
+                    <if test="categoryId != null">AND b.category_id = #{categoryId}</if>
+                    <if test="status != null and status != ''">AND b.status = #{status}</if>
+                    <if test="isExcluded != null">AND b.is_excluded = #{isExcluded}</if>
+                </where>
+                ORDER BY b.site_id, b.import_date DESC, b.id DESC
+        </if>
+    </select>
+    
+    <select id="selectGbTitlePoolBatchById" parameterType="Long" resultMap="GbTitlePoolBatchResult">
+        <include refid="selectGbTitlePoolBatchVo"/>
+        WHERE b.id = #{id}
+    </select>
+
+    <select id="selectGbTitlePoolBatchByCode" parameterType="String" resultMap="GbTitlePoolBatchResult">
+        <include refid="selectGbTitlePoolBatchVo"/>
+        WHERE b.batch_code = #{batchCode}
+    </select>
+        
+    <insert id="insertGbTitlePoolBatch" parameterType="GbTitlePoolBatch" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gb_title_pool_batch
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">site_id,</if>
+            <if test="batchCode != null and batchCode != ''">batch_code,</if>
+            <if test="batchName != null">batch_name,</if>
+            <if test="importDate != null">import_date,</if>
+            <if test="importSource != null">import_source,</if>
+            <if test="titleCount != null">title_count,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="status != null">status,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">#{siteId},</if>
+            <if test="batchCode != null and batchCode != ''">#{batchCode},</if>
+            <if test="batchName != null">#{batchName},</if>
+            <if test="importDate != null">#{importDate},</if>
+            <if test="importSource != null">#{importSource},</if>
+            <if test="titleCount != null">#{titleCount},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="status != null">#{status},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbTitlePoolBatch" parameterType="GbTitlePoolBatch">
+        UPDATE gb_title_pool_batch
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="batchCode != null and batchCode != ''">batch_code = #{batchCode},</if>
+            <if test="batchName != null">batch_name = #{batchName},</if>
+            <if test="importDate != null">import_date = #{importDate},</if>
+            <if test="importSource != null">import_source = #{importSource},</if>
+            <if test="titleCount != null">title_count = #{titleCount},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteGbTitlePoolBatchById" parameterType="Long">
+        DELETE FROM gb_title_pool_batch WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteGbTitlePoolBatchByIds" parameterType="String">
+        DELETE FROM gb_title_pool_batch WHERE id IN 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- 逻辑删除批次关联的标题 -->
+    <update id="markTitlesAsDeletedByBatchId" parameterType="Long">
+        UPDATE gb_title_pool 
+        SET del_flag = '2'
+        WHERE import_batch = (
+            SELECT batch_code COLLATE utf8mb4_unicode_ci 
+            FROM gb_title_pool_batch WHERE id = #{id}
+        )
+    </update>
+    
+    <!-- 批量逻辑删除标题 -->
+    <update id="markTitlesAsDeletedByBatchIds" parameterType="String">
+        UPDATE gb_title_pool 
+        SET del_flag = '2'
+        WHERE import_batch IN (
+            SELECT batch_code COLLATE utf8mb4_unicode_ci 
+            FROM gb_title_pool_batch WHERE id IN 
+            <foreach item="id" collection="array" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        )
+    </update>
+
+    <!-- 生成新的批次号 -->
+    <select id="generateBatchCode" resultType="String">
+        SELECT CONCAT(
+            'SITE_', 
+            #{siteId}, 
+            '_', 
+            DATE_FORMAT(NOW(), '%Y%m%d%H%i%s'),
+            '_',
+            LPAD(FLOOR(RAND() * 1000), 3, '0')
+        ) as batch_code
+    </select>
+
+    <!-- 更新批次的标题数量 -->
+    <update id="updateBatchTitleCount">
+        UPDATE gb_title_pool_batch b
+        SET b.title_count = (
+            SELECT COUNT(*)
+            FROM gb_title_pool t
+            WHERE t.import_batch = #{batchCode}
+              AND t.del_flag = '0'
+        )
+        WHERE b.batch_code = #{batchCode}
+    </update>
+
+    <!-- 获取批次关联的网站列表 -->
+    <select id="getBatchSites" resultMap="BatchSiteRelationResult">
+        SELECT 
+            r.site_id,
+            r.is_visible,
+            r.relation_type,
+            s.name as site_name,
+            s.code as site_code,
+            s.domain as site_domain
+        FROM gb_site_title_batch_relations r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        WHERE r.title_batch_id = #{batchId}
+        ORDER BY r.relation_type, r.site_id
+    </select>
+
+    <!-- 删除批次的所有网站关联关系 -->
+    <delete id="deleteBatchRelations">
+        DELETE FROM gb_site_title_batch_relations
+        WHERE title_batch_id = #{batchId}
+          AND relation_type = 'include'
+    </delete>
+
+    <!-- 批量插入批次与网站的关联关系 -->
+    <insert id="batchInsertBatchRelations">
+        INSERT INTO gb_site_title_batch_relations (site_id, title_batch_id, is_visible, relation_type)
+        VALUES
+        <foreach collection="siteIds" item="siteId" separator=",">
+            (#{siteId}, #{batchId}, #{isVisible}, 'include')
+        </foreach>
+    </insert>
+
+    <!-- 删除批次与指定网站的关联关系 -->
+    <delete id="deleteBatchSiteRelation">
+        DELETE FROM gb_site_title_batch_relations
+        WHERE site_id = #{siteId}
+          AND title_batch_id = #{batchId}
+          AND relation_type = 'include'
+    </delete>
+
+    <!-- 更新批次与网站关联的可见性 -->
+    <update id="updateBatchRelationVisibility">
+        UPDATE gb_site_title_batch_relations
+        SET is_visible = #{isVisible}
+        WHERE site_id = #{siteId}
+          AND title_batch_id = #{batchId}
+          AND relation_type = 'include'
+    </update>
+
+</mapper>

@@ -1,0 +1,90 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" && $CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_BRANCH == "main"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      when: always
+
+stages:
+  - build
+  - deploy
+
+# ==================== 文档构建任务 ====================
+build-docs:
+  stage: build
+  image: node:22
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
+  allow_failure: true
+  script:
+    - echo "开始构建文档..."
+    - cd docs
+    - npm install -g pnpm
+    - pnpm install
+    - pnpm run docs:build
+  artifacts:
+    paths:
+      - docs/.vitepress/dist
+    expire_in: 1 hour
+    when: on_success
+
+# ==================== RuoYi-Vue3 构建任务 ====================
+build-ruoyi:
+  stage: build
+  image: node:22
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
+  script:
+    - echo "开始构建 RuoYi-Vue3 项目..."
+    - cd RuoYi-Vue3
+    - npm install -g pnpm
+    - pnpm i
+    - pnpm build:prod
+  artifacts:
+    paths:
+      - RuoYi-Vue3/dist
+    expire_in: 1 hour
+
+# ==================== GitLab Pages 部署任务 ====================
+pages:
+  stage: deploy
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
+  dependencies:
+    - build-docs
+    - build-ruoyi
+  script:
+    - echo "开始部署到 GitLab Pages..."
+    - mkdir -p public
+    - |
+      if [ -d "docs/.vitepress/dist" ]; then
+        echo "部署文档到根路径..."
+        cp -r docs/.vitepress/dist/* public/
+      else
+        echo "警告:文档构建产物不存在,跳过文档部署"
+        echo "<h1>文档构建失败</h1>" > public/index.html
+      fi
+    - |
+      if [ -d "RuoYi-Vue3/dist" ]; then
+        echo "部署 RuoYi-Vue3 到 /manager/ 路径..."
+        mkdir -p public/manager
+        cp -r RuoYi-Vue3/dist/* public/manager/
+      else
+        echo "警告:RuoYi-Vue3构建产物不存在,跳过管理系统部署"
+        mkdir -p public/manager
+        echo "<h1>管理系统构建失败</h1>" > public/manager/index.html
+      fi
+    - echo "部署完成！"
+    - echo "文档访问路径:/"
+    - echo "管理系统访问路径:/manager/"
+  artifacts:
+    paths:
+      - public

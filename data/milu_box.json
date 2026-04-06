@@ -1,0 +1,39 @@
+{
+  "username": "gms123456",
+  "agent_id": "4g5j",
+  "promotion_links": {
+    "专服": "https://zf.heigu.com/?a=4g5j&u=1",
+    "0.1折": "https://01zhe.milu.com/?a=4g5j&u=1",
+    "0.05折": "https://005zhe.milu.com/?a=4g5j&u=1",
+    "免费版": "https://mianfei.milu.com/?a=4g5j&u=1"
+  },
+  "box_links": [
+    "https://app.milu.com/?a=4g5j&u=1",
+    "https://app.milu.com/a2?a=4g5j&u=1",
+    "https://app.milu.com/a6?a=4g5j&u=1",
+    "https://app.milu.com/a8?a=4g5j&u=1",
+    "https://app.milu.com/game1?a=4g5j&u=1",
+    "https://app.milu.com/game2?a=4g5j&u=1",
+    "https://app.milu.com/game3?a=4g5j&u=1",
+    "https://app.milu.com/zhe1?a=4g5j&u=1",
+    "https://app.milu.com/05zhe?a=4g5j&u=1",
+    "https://app.milu.com/mianfei?a=4g5j&u=1"
+  ],
+  "game_links": [
+    "https://app.milu.com/special/?id=xxx&a=4g5j&u=1",
+    "https://app.milu.com/special1/?id=xxx&a=4g5j&u=1",
+    "https://app.milu.com/special2/?id=xxx&a=4g5j&u=1"
+  ],
+  "topic_links": {
+    "传奇": "https://app.milu.com/cqzt/?a=4g5j&u=1",
+    "仙侠": "https://app.milu.com/xxzt/?a=4g5j&u=1",
+    "西游": "https://app.milu.com/xyzt/?a=4g5j&u=1",
+    "回合": "https://app.milu.com/hhzt/?a=4g5j&u=1",
+    "卡牌": "https://app.milu.com/kpzt/?a=4g5j&u=1",
+    "三国": "https://app.milu.com/sgzt/?a=4g5j&u=1",
+    "魔幻": "https://app.milu.com/mhzt/?a=4g5j&u=1",
+    "动漫": "https://app.milu.com/dmzt/?a=4g5j&u=1"
+  },
+  "parsed_at": "2026-03-05T15:33:29.986616",
+  "crawl_time": "2026-03-05T15:33:29.989102"
+}

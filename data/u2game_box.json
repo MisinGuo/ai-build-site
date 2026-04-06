@@ -1,0 +1,30 @@
+{
+  "a": "1",
+  "b": "成功",
+  "c": {
+    "id": 2,
+    "gamename": "游戏盒子",
+    "addtime": 1722219782,
+    "tag": "yxhz",
+    "pic1": "http://www.u2game99.com/data/upload/game/20240813/66bb02722f681.png",
+    "welfare": "",
+    "download": "https://qd.u2game99.com//down.html?ag=GMS123&gid=2",
+    "box_type": true,
+    "vip_starcoin": true,
+    "qrcode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQMAAABB54RGAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABlUlEQVRoge2aza3DIBCEV0oBLsmtUxIFIPHM/rBg5R0j5jBzwAQ+5zJhGVBEKIr6ka7uKlfbx5rEVCOKgvqzl9EMGVpiLBGiCKiZWDaLo1kdJ4qFyj2MvevneVQhiow+I4N6eO0RhURVXiWtXg5j9fUNIXoe/VYqo3ERRUF3jcWnlfM/gOhRVI21Aunl0yvnaGQvmkRPo6YxvH3sue0JUST0MVbz4gyNIpJ26hhRGNTzolbK6hZHmhz99TdA9Ch6eZVMd0VXpW12Y6zENxI9jibf22Kx9uLiqhHFQf0sVn1jszFVhhSiEKjFx4yKu6e2FoUoEOon54lWDylxw0gUBRXPi36HKPNUZvJISRQDjZSoRTKjiTpu18NFiKKgskYO2+dyQabtRDHQj/uX91O6+EreDBPFQaeWfS5iv1/mN6Ig6Mu/vJrq/uYraRI9isZcySYPZFE5icKgbqLMGBK9mCCKh2qvRj65e/z/ZnpPFAntM+JHDbXjGlEkVLWm+2v63L9vcURPod31mrNlWD9EkVCKon6gP8VT7v2ZFYRtAAAAAElFTkSuQmCC",
+    "openurl": "https://open1037.u2game99.com",
+    "openqrcode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASIAAAEiAQMAAABncE31AAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABQ0lEQVRoge3YS66DMAwFUEssIEvK1lkSC0DyA/+fWrWTmEmvB7TAYWTFjkOEQPxkDLbYabuuBxHv4yR/ekI1KvvNdzSvd9dH9S1Uk5JE6ON5bOwf3VmDekaNWCJ5C/WMcvAlj1ArVT72JvGpfkGtU2whXSEvFlCNqsTVEKbshl7eQLWoWA53WKE6xNtHUH3qjKJ0kmaIA0D1KilKXpkkTZPrP6g2de+BdvKI4Yu1IQyoXmVpUn8vDM6EQTUq6Qo6826lPL3rHVCrlbRg8gnskDHMotQvqB6V3deXQ8zBA6pZURQlA6wq2wVUh8rw7aid9cgtVKcqJw+sc5cl57UjQ61W9ltOO7UXxFQG1agyJRozKhP/2w1BdSodvnQe8IkY6hllhUrzskH1KwlNSTno5Pf1C2qhYou6OqiUJ6g2hUD8XPwBq5F5O8AMi+8AAAAASUVORK5CYII=",
+    "avatar": null,
+    "dwzdownurl": "https://qd.u2game99.com//down.html?ag=GMS123&gid=2",
+    "dwzdownurlmash": "https://qd.u2game99.com//down.html?mash=TbZIVBOR&gid=2",
+    "url1": "https://www.u2game99.com/app/1037.html",
+    "url2": "https://qdzs.u2game99.com/welcome/page/ag/1037.html",
+    "url3": "https://www.u2game99.com/wc/1037/42.html",
+    "url4": "https://www.u2game99.com/?tgid=1037",
+    "url5": "https://open.u2game99.com/?aig=1037",
+    "qrcode1": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQMAAABB54RGAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABoklEQVRoge2ZSw7DMAhEkXKAHMlX95FygEhuAox/7baCxbBwYvu1mxFmcEQYDMaf4mwe9Zm0qtPreMdbsHUTzYL686GePeVfVDd0OhCiGVATsS/bW7mgcyWaEB3LzxvEJpoUlTf55JgPTaL50CGilKZDX1sQovEoXIeVuHXwIJoFnUIzUA3JMyk/AKLR6OnS6cNsiB2ar4csNhDNgmphUwdyoqY5KuIZiEOTaDzqlQzD4XVuBoRoEvRd0QOyQMQ2atqWsUSjUfCqqRl7FdbU1bVdXaJhqFr8Vb8CV4K++iaaBfUMtOQbuVjxH5OwRBOgbhUVnXy+330s5yvRWFTE++UqvSubfrmdr0RjUbs0RFdWYfuN0p6tTucr0WDUn25I+t2HWZOr3ysSTYJicqwS97J3EU2FnrikGhVvvr26iSZBRyAhXUnz+c4TzYGuH1d63qG6tc2QEI1FR4lD+9yAwpoQTYRCRCwX09kzcLGPRDOhlpVQd2/NiCZDcQvcpvidhkRjUA0vZ8snTPn+DkM0FoV89Zxtv6ehbgjRLCiDwfhDfADZRf2FskP8eQAAAABJRU5ErkJggg==",
+    "qrcode4": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQMAAABB54RGAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABpUlEQVRoge2ay62FMAxELaWAlETrlEQBSHnBvziI7ZX9pPEiQDisBtuTABECgfhR9KFxzgsb2ry+5pnGDbQKqkcG5pEHpm55ciFAK6A6/cwcU04dZO5RHGhBlDWd91TYJw2B/gOUCynQmqgoeZKVynFZizs3BGg+6oaka+UMw8uQAM1GV4QW10LyfQXQJFTKousnQDOxyXMRaAX0CfWLs7vxEAtpC5dA01Hxi22EFueLtDUHtAi6Jd+5svKyuyw70BIo2a6UiOgWX+1jG7ykBloDNU1FWEVv8/7XVjSBZqPGG/Da+3i9A0Bz0WdayqKXykMW0pyabYT6CjQbXRm4mf3Fh3cAaAX0GKaunqmmOnSgVVAziCLs4Z9ZvOPthgRoKurCxp16Tb6Pogk0FZWlmQNu8WltXBHQKuj+kCTkamz9pi8eaBIq+g3Z7CD3J+ungM3sA01G9SiNzV2J9rke94OBVkA50Ww38ZalWSiascUBrYISyXdlCtH1BtBq6OvMV2pfaQg0DeXQFucdbzi1m32gqajNe4szG2L8l3cBmoMiEIgfxB/5SFXxxndHcgAAAABJRU5ErkJggg==",
+    "qrcode5": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAFKAQMAAABB54RGAAAABlBMVEX///8AAABVwtN+AAAACXBIWXMAAA7EAAAOxAGVKw4bAAABoklEQVRoge2ZXY7DIAyEkXIAjsTVOVIOUMkL/sGUdPetsleaeSAK/eiLxXggpUAQ9CVVUvXxsg10z0H0ApoF1ecALhpPHobarYscAZoB5dJRnzMT8GHMzYoDTYhyTcdvVmeg/wOtapVAE6JbJRnQ7vb6w1+BBqErkFR1zm04AgnQaNS1tbiLuLq/CmgQKra46idbbtgn872sDAk0A1p4xrpbI25xyo/qXusVaCL00djskLaZJtBotL5Vsvuu5G24jBRoDtQyvRR2HZ8FZfvcLqmAxqLyotU11A8Ah2kCDUaHJsqSlXr3cemcFxZoOGq5o9kZWsM+eZAsQJOg3t2K78DLztWnvwKNRVdhPew3c07JlctDgYajVdO93UppPuHfND4S0CxocYPklSR1Vt0PfwUaiVrphJcdaJFy/w+gGdBjkZzPVmOzrQk0B3p8XCn71ZTYZwOaB9WnTnPYt5VvV1hAc6BbEXUvapp0IwWaDfXrKpeFS6DZUDPI7UgtKz9vQ6AxKEtbXKXHV+fjkgpoJEqqbtNWYu94n7IL0AgUgqAv6Ac5eoUrW3V8qgAAAABJRU5ErkJggg=="
+  },
+  "crawl_time": "2026-03-05T15:33:09.770866"
+}

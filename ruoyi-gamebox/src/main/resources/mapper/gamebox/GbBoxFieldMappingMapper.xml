@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbBoxFieldMappingMapper">
+    
+    <resultMap type="GbBoxFieldMapping" id="GbFieldMappingResult">
+        <result property="id"    column="id"    />
+        <result property="boxId"    column="box_id"    />
+        <result property="resourceType"    column="resource_type"    />
+        <result property="sourceField"    column="source_field"    />
+        <result property="targetField"    column="target_field"    />
+        <result property="fieldType"    column="field_type"    />
+        <result property="targetLocation"    column="target_location"    />
+        <result property="transformExpression"    column="transform_expression"    />
+        <result property="valueMapping"    column="value_mapping"    />
+        <result property="defaultValue"    column="default_value"    />
+        <result property="isRequired"    column="is_required"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="status"    column="status"    />
+        <result property="conflictStrategy"    column="conflict_strategy"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectGbFieldMappingVo">
+        select id, box_id, resource_type, source_field, target_field, field_type, target_location, 
+               transform_expression, value_mapping, default_value, is_required, sort_order, status,
+               conflict_strategy, create_by, create_time, update_by, update_time, remark 
+        from gb_box_field_mappings
+    </sql>
+
+    <select id="selectGbBoxFieldMappingList" parameterType="GbBoxFieldMapping" resultMap="GbFieldMappingResult">
+        <include refid="selectGbFieldMappingVo"/>
+        <where>  
+            <if test="resourceType != null  and resourceType != ''"> and resource_type = #{resourceType}</if>
+            <if test="sourceField != null  and sourceField != ''"> and source_field like concat('%', #{sourceField}, '%')</if>
+            <if test="targetField != null  and targetField != ''"> and target_field like concat('%', #{targetField}, '%')</if>
+            <if test="targetLocation != null  and targetLocation != ''"> and target_location = #{targetLocation}</if>
+            <if test="status != null  and status != ''"> and status = #{status}</if>
+        </where>
+        order by resource_type, sort_order, id
+    </select>
+    
+    <select id="selectGbBoxFieldMappingById" parameterType="Long" resultMap="GbFieldMappingResult">
+        <include refid="selectGbFieldMappingVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectByPlatformAndType" resultMap="GbFieldMappingResult">
+        <include refid="selectGbFieldMappingVo"/>
+        where platform = #{platform} and resource_type = #{resourceType} and status = '1'
+        order by sort_order, id
+    </select>
+
+    <select id="selectByBoxId" resultMap="GbFieldMappingResult">
+        select id, box_id, resource_type, source_field, target_field, field_type, target_location, 
+               transform_expression, value_mapping, default_value, is_required, sort_order, status,
+               conflict_strategy, create_by, create_time, update_by, update_time, remark 
+        from gb_box_field_mappings
+        where box_id = #{boxId} and status = '1'
+        order by 
+            CASE target_location
+                WHEN 'main' THEN 1
+                WHEN 'category_relation' THEN 2
+                WHEN 'relation' THEN 3
+                WHEN 'promotion_link' THEN 4
+                WHEN 'platform_data' THEN 5
+                ELSE 999
+            END,
+            sort_order, id
+    </select>
+
+    <select id="checkFieldMappingExists" resultType="Long">
+        select id from gb_box_field_mappings 
+        where platform = #{platform} and resource_type = #{resourceType} and source_field = #{sourceField}
+        limit 1
+    </select>
+
+    <insert id="insertGbBoxFieldMapping" parameterType="GbBoxFieldMapping" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_box_field_mappings
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="boxId != null">box_id,</if>
+            <if test="resourceType != null and resourceType != ''">resource_type,</if>
+            <if test="sourceField != null and sourceField != ''">source_field,</if>
+            <if test="targetField != null and targetField != ''">target_field,</if>
+            <if test="fieldType != null and fieldType != ''">field_type,</if>
+            <if test="targetLocation != null and targetLocation != ''">target_location,</if>
+            <if test="transformExpression != null">transform_expression,</if>
+            <if test="valueMapping != null">value_mapping,</if>
+            <if test="defaultValue != null">default_value,</if>
+            <if test="isRequired != null">is_required,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null">status,</if>
+            <if test="conflictStrategy != null">conflict_strategy,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="remark != null">remark,</if>
+            create_time
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="boxId != null">#{boxId},</if>
+            <if test="resourceType != null and resourceType != ''">#{resourceType},</if>
+            <if test="sourceField != null and sourceField != ''">#{sourceField},</if>
+            <if test="targetField != null and targetField != ''">#{targetField},</if>
+            <if test="fieldType != null and fieldType != ''">#{fieldType},</if>
+            <if test="targetLocation != null and targetLocation != ''">#{targetLocation},</if>
+            <if test="transformExpression != null">#{transformExpression},</if>
+            <if test="valueMapping != null">#{valueMapping},</if>
+            <if test="defaultValue != null">#{defaultValue},</if>
+            <if test="isRequired != null">#{isRequired},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null">#{status},</if>
+            <if test="conflictStrategy != null">#{conflictStrategy},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            sysdate()
+        </trim>
+    </insert>
+
+    <update id="updateGbBoxFieldMapping" parameterType="GbBoxFieldMapping">
+        update gb_box_field_mappings
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="boxId != null">box_id = #{boxId},</if>
+            <if test="resourceType != null and resourceType != ''">resource_type = #{resourceType},</if>
+            <if test="sourceField != null and sourceField != ''">source_field = #{sourceField},</if>
+            <if test="targetField != null and targetField != ''">target_field = #{targetField},</if>
+            <if test="fieldType != null and fieldType != ''">field_type = #{fieldType},</if>
+            <if test="targetLocation != null and targetLocation != ''">target_location = #{targetLocation},</if>
+            <if test="transformExpression != null">transform_expression = #{transformExpression},</if>
+            <if test="valueMapping != null">value_mapping = #{valueMapping},</if>
+            <if test="defaultValue != null">default_value = #{defaultValue},</if>
+            <if test="isRequired != null">is_required = #{isRequired},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="conflictStrategy != null">conflict_strategy = #{conflictStrategy},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            update_time = sysdate()
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGbBoxFieldMappingById" parameterType="Long">
+        delete from gb_box_field_mappings where id = #{id}
+    </delete>
+
+    <delete id="deleteGbBoxFieldMappingByIds" parameterType="Long">
+        delete from gb_box_field_mappings where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByBoxId" parameterType="Long">
+        delete from gb_box_field_mappings where box_id = #{boxId}
+    </delete>
+
+    <insert id="batchInsertGbBoxFieldMapping" parameterType="java.util.List">
+        insert into gb_box_field_mappings (box_id, resource_type, source_field, target_field, field_type, 
+                                        target_location, transform_expression, value_mapping, default_value, is_required, 
+                                        sort_order, status, create_by, remark, create_time)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.boxId}, #{item.resourceType}, #{item.sourceField}, #{item.targetField}, #{item.fieldType},
+             #{item.targetLocation}, #{item.transformExpression}, #{item.valueMapping}, #{item.defaultValue}, #{item.isRequired},
+             #{item.sortOrder}, #{item.status}, #{item.createBy}, #{item.remark}, sysdate())
+        </foreach>
+    </insert>
+    
+    <update id="batchUpdateGbBoxFieldMapping" parameterType="java.util.List">
+        update gb_box_field_mappings
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="box_id = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.boxId != null">
+                        when id = #{item.id} then #{item.boxId}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="resource_type = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.resourceType != null and item.resourceType != ''">
+                        when id = #{item.id} then #{item.resourceType}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="source_field = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.sourceField != null and item.sourceField != ''">
+                        when id = #{item.id} then #{item.sourceField}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="target_field = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.targetField != null and item.targetField != ''">
+                        when id = #{item.id} then #{item.targetField}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="field_type = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.fieldType != null and item.fieldType != ''">
+                        when id = #{item.id} then #{item.fieldType}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="target_location = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.targetLocation != null and item.targetLocation != ''">
+                        when id = #{item.id} then #{item.targetLocation}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="status = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.status != null">
+                        when id = #{item.id} then #{item.status}
+                    </if>
+                </foreach>
+            </trim>
+            <trim prefix="remark = case" suffix="end,">
+                <foreach collection="list" item="item">
+                    <if test="item.remark != null">
+                        when id = #{item.id} then #{item.remark}
+                    </if>
+                </foreach>
+            </trim>
+            update_time = sysdate()
+        </trim>
+        where id in
+        <foreach collection="list" item="item" open="(" separator="," close=")">
+            #{item.id}
+        </foreach>
+    </update>
+    
+    <!-- 查询指定表字段的所有不同值 -->
+    <select id="selectFieldDistinctValues" resultType="String">
+        SELECT DISTINCT ${fieldName}
+        FROM ${tableName}
+        WHERE ${fieldName} IS NOT NULL AND ${fieldName} != ''
+        ORDER BY ${fieldName}
+    </select></mapper>
+

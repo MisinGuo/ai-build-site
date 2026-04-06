@@ -1,0 +1,157 @@
+<svg width="1920" height="1080" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a0a2e"/>
+      <stop offset="50%" style="stop-color:#0d1020"/>
+      <stop offset="100%" style="stop-color:#0a1628"/>
+    </linearGradient>
+    <radialGradient id="glow1" cx="28%" cy="52%" r="32%">
+      <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:0.55"/>
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="78%" cy="28%" r="26%">
+      <stop offset="0%" style="stop-color:#ec4899;stop-opacity:0.40"/>
+      <stop offset="100%" style="stop-color:#ec4899;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="glow3" cx="85%" cy="75%" r="22%">
+      <stop offset="0%" style="stop-color:#06b6d4;stop-opacity:0.30"/>
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="glow4" cx="50%" cy="10%" r="18%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="gblur">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+  </defs>
+
+  <!-- Base -->
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+
+  <!-- Ambient glows -->
+  <ellipse cx="538" cy="562" rx="520" ry="420" fill="url(#glow1)"/>
+  <ellipse cx="1498" cy="302" rx="440" ry="340" fill="url(#glow2)"/>
+  <ellipse cx="1632" cy="810" rx="360" ry="280" fill="url(#glow3)"/>
+  <ellipse cx="960" cy="108" rx="320" ry="180" fill="url(#glow4)"/>
+
+  <!-- Fine dot grid -->
+  <g fill="#c4b5fd" opacity="0.18">
+    <circle cx="80"  cy="80"  r="1.4"/><circle cx="200" cy="80"  r="1.4"/><circle cx="320" cy="80"  r="1.4"/><circle cx="440" cy="80"  r="1.4"/><circle cx="560" cy="80"  r="1.4"/><circle cx="680" cy="80"  r="1.4"/><circle cx="800" cy="80"  r="1.4"/><circle cx="920" cy="80"  r="1.4"/><circle cx="1040" cy="80" r="1.4"/><circle cx="1160" cy="80" r="1.4"/><circle cx="1280" cy="80" r="1.4"/><circle cx="1400" cy="80" r="1.4"/><circle cx="1520" cy="80" r="1.4"/><circle cx="1640" cy="80" r="1.4"/><circle cx="1760" cy="80" r="1.4"/><circle cx="1880" cy="80" r="1.4"/>
+    <circle cx="80"  cy="200" r="1.4"/><circle cx="200" cy="200" r="1.4"/><circle cx="320" cy="200" r="1.4"/><circle cx="440" cy="200" r="1.4"/><circle cx="560" cy="200" r="1.4"/><circle cx="680" cy="200" r="1.4"/><circle cx="800" cy="200" r="1.4"/><circle cx="920" cy="200" r="1.4"/><circle cx="1040" cy="200" r="1.4"/><circle cx="1160" cy="200" r="1.4"/><circle cx="1280" cy="200" r="1.4"/><circle cx="1400" cy="200" r="1.4"/><circle cx="1520" cy="200" r="1.4"/><circle cx="1640" cy="200" r="1.4"/><circle cx="1760" cy="200" r="1.4"/><circle cx="1880" cy="200" r="1.4"/>
+    <circle cx="80"  cy="320" r="1.4"/><circle cx="200" cy="320" r="1.4"/><circle cx="320" cy="320" r="1.4"/><circle cx="440" cy="320" r="1.4"/><circle cx="560" cy="320" r="1.4"/><circle cx="680" cy="320" r="1.4"/><circle cx="800" cy="320" r="1.4"/><circle cx="920" cy="320" r="1.4"/><circle cx="1040" cy="320" r="1.4"/><circle cx="1160" cy="320" r="1.4"/><circle cx="1280" cy="320" r="1.4"/><circle cx="1400" cy="320" r="1.4"/><circle cx="1520" cy="320" r="1.4"/><circle cx="1640" cy="320" r="1.4"/><circle cx="1760" cy="320" r="1.4"/><circle cx="1880" cy="320" r="1.4"/>
+    <circle cx="80"  cy="440" r="1.4"/><circle cx="200" cy="440" r="1.4"/><circle cx="320" cy="440" r="1.4"/><circle cx="440" cy="440" r="1.4"/><circle cx="560" cy="440" r="1.4"/><circle cx="680" cy="440" r="1.4"/><circle cx="800" cy="440" r="1.4"/><circle cx="920" cy="440" r="1.4"/><circle cx="1040" cy="440" r="1.4"/><circle cx="1160" cy="440" r="1.4"/><circle cx="1280" cy="440" r="1.4"/><circle cx="1400" cy="440" r="1.4"/><circle cx="1520" cy="440" r="1.4"/><circle cx="1640" cy="440" r="1.4"/><circle cx="1760" cy="440" r="1.4"/><circle cx="1880" cy="440" r="1.4"/>
+    <circle cx="80"  cy="560" r="1.4"/><circle cx="200" cy="560" r="1.4"/><circle cx="320" cy="560" r="1.4"/><circle cx="440" cy="560" r="1.4"/><circle cx="560" cy="560" r="1.4"/><circle cx="680" cy="560" r="1.4"/><circle cx="800" cy="560" r="1.4"/><circle cx="920" cy="560" r="1.4"/><circle cx="1040" cy="560" r="1.4"/><circle cx="1160" cy="560" r="1.4"/><circle cx="1280" cy="560" r="1.4"/><circle cx="1400" cy="560" r="1.4"/><circle cx="1520" cy="560" r="1.4"/><circle cx="1640" cy="560" r="1.4"/><circle cx="1760" cy="560" r="1.4"/><circle cx="1880" cy="560" r="1.4"/>
+    <circle cx="80"  cy="680" r="1.4"/><circle cx="200" cy="680" r="1.4"/><circle cx="320" cy="680" r="1.4"/><circle cx="440" cy="680" r="1.4"/><circle cx="560" cy="680" r="1.4"/><circle cx="680" cy="680" r="1.4"/><circle cx="800" cy="680" r="1.4"/><circle cx="920" cy="680" r="1.4"/><circle cx="1040" cy="680" r="1.4"/><circle cx="1160" cy="680" r="1.4"/><circle cx="1280" cy="680" r="1.4"/><circle cx="1400" cy="680" r="1.4"/><circle cx="1520" cy="680" r="1.4"/><circle cx="1640" cy="680" r="1.4"/><circle cx="1760" cy="680" r="1.4"/><circle cx="1880" cy="680" r="1.4"/>
+    <circle cx="80"  cy="800" r="1.4"/><circle cx="200" cy="800" r="1.4"/><circle cx="320" cy="800" r="1.4"/><circle cx="440" cy="800" r="1.4"/><circle cx="560" cy="800" r="1.4"/><circle cx="680" cy="800" r="1.4"/><circle cx="800" cy="800" r="1.4"/><circle cx="920" cy="800" r="1.4"/><circle cx="1040" cy="800" r="1.4"/><circle cx="1160" cy="800" r="1.4"/><circle cx="1280" cy="800" r="1.4"/><circle cx="1400" cy="800" r="1.4"/><circle cx="1520" cy="800" r="1.4"/><circle cx="1640" cy="800" r="1.4"/><circle cx="1760" cy="800" r="1.4"/><circle cx="1880" cy="800" r="1.4"/>
+    <circle cx="80"  cy="920" r="1.4"/><circle cx="200" cy="920" r="1.4"/><circle cx="320" cy="920" r="1.4"/><circle cx="440" cy="920" r="1.4"/><circle cx="560" cy="920" r="1.4"/><circle cx="680" cy="920" r="1.4"/><circle cx="800" cy="920" r="1.4"/><circle cx="920" cy="920" r="1.4"/><circle cx="1040" cy="920" r="1.4"/><circle cx="1160" cy="920" r="1.4"/><circle cx="1280" cy="920" r="1.4"/><circle cx="1400" cy="920" r="1.4"/><circle cx="1520" cy="920" r="1.4"/><circle cx="1640" cy="920" r="1.4"/><circle cx="1760" cy="920" r="1.4"/><circle cx="1880" cy="920" r="1.4"/>
+    <circle cx="80"  cy="1040" r="1.4"/><circle cx="200" cy="1040" r="1.4"/><circle cx="320" cy="1040" r="1.4"/><circle cx="440" cy="1040" r="1.4"/><circle cx="560" cy="1040" r="1.4"/><circle cx="680" cy="1040" r="1.4"/><circle cx="800" cy="1040" r="1.4"/><circle cx="920" cy="1040" r="1.4"/><circle cx="1040" cy="1040" r="1.4"/><circle cx="1160" cy="1040" r="1.4"/><circle cx="1280" cy="1040" r="1.4"/><circle cx="1400" cy="1040" r="1.4"/><circle cx="1520" cy="1040" r="1.4"/><circle cx="1640" cy="1040" r="1.4"/><circle cx="1760" cy="1040" r="1.4"/><circle cx="1880" cy="1040" r="1.4"/>
+  </g>
+
+  <!-- Diagonal lines forming diamond grid -->
+  <g stroke="#a78bfa" stroke-width="0.6" opacity="0.10">
+    <line x1="0"    y1="0"    x2="1920" y2="1920"/>
+    <line x1="240"  y1="0"    x2="1920" y2="1680"/>
+    <line x1="480"  y1="0"    x2="1920" y2="1440"/>
+    <line x1="720"  y1="0"    x2="1920" y2="1200"/>
+    <line x1="960"  y1="0"    x2="1920" y2="960"/>
+    <line x1="1200" y1="0"    x2="1920" y2="720"/>
+    <line x1="1440" y1="0"    x2="1920" y2="480"/>
+    <line x1="1680" y1="0"    x2="1920" y2="240"/>
+    <line x1="0"    y1="240"  x2="1680" y2="1920"/>
+    <line x1="0"    y1="480"  x2="1440" y2="1920"/>
+    <line x1="0"    y1="720"  x2="1200" y2="1920"/>
+    <line x1="0"    y1="960"  x2="960"  y2="1920"/>
+    <line x1="0"    y1="1200" x2="720"  y2="1920"/>
+    <line x1="0"    y1="1440" x2="480"  y2="1920"/>
+    <line x1="0"    y1="1680" x2="240"  y2="1920"/>
+    <!-- opposite direction -->
+    <line x1="1920" y1="0"    x2="0"    y2="1920"/>
+    <line x1="1680" y1="0"    x2="0"    y2="1680"/>
+    <line x1="1440" y1="0"    x2="0"    y2="1440"/>
+    <line x1="1200" y1="0"    x2="0"    y2="1200"/>
+    <line x1="960"  y1="0"    x2="0"    y2="960"/>
+    <line x1="720"  y1="0"    x2="0"    y2="720"/>
+    <line x1="480"  y1="0"    x2="0"    y2="480"/>
+    <line x1="240"  y1="0"    x2="0"    y2="240"/>
+    <line x1="1920" y1="240"  x2="240"  y2="1920"/>
+    <line x1="1920" y1="480"  x2="480"  y2="1920"/>
+    <line x1="1920" y1="720"  x2="720"  y2="1920"/>
+    <line x1="1920" y1="960"  x2="960"  y2="1920"/>
+    <line x1="1920" y1="1200" x2="1200" y2="1920"/>
+    <line x1="1920" y1="1440" x2="1440" y2="1920"/>
+    <line x1="1920" y1="1680" x2="1680" y2="1920"/>
+  </g>
+
+  <!-- Bright floating particles -->
+  <g filter="url(#gblur)">
+    <circle cx="320"  cy="180" r="3.5" fill="#c4b5fd" opacity="0.9"/>
+    <circle cx="680"  cy="95"  r="2.5" fill="#f0abfc" opacity="0.8"/>
+    <circle cx="1050" cy="220" r="4"   fill="#a78bfa" opacity="0.85"/>
+    <circle cx="1380" cy="140" r="3"   fill="#818cf8" opacity="0.8"/>
+    <circle cx="1680" cy="260" r="3.5" fill="#f472b6" opacity="0.75"/>
+    <circle cx="200"  cy="480" r="2.5" fill="#c4b5fd" opacity="0.7"/>
+    <circle cx="840"  cy="380" r="3"   fill="#67e8f9" opacity="0.7"/>
+    <circle cx="1560" cy="440" r="4"   fill="#a78bfa" opacity="0.75"/>
+    <circle cx="450"  cy="720" r="3"   fill="#f472b6" opacity="0.65"/>
+    <circle cx="1200" cy="650" r="2.5" fill="#c4b5fd" opacity="0.7"/>
+    <circle cx="1800" cy="580" r="3.5" fill="#67e8f9" opacity="0.65"/>
+    <circle cx="100"  cy="950" r="3"   fill="#a78bfa" opacity="0.6"/>
+    <circle cx="720"  cy="900" r="2.5" fill="#f0abfc" opacity="0.65"/>
+    <circle cx="1440" cy="860" r="4"   fill="#818cf8" opacity="0.6"/>
+    <circle cx="1840" cy="980" r="3"   fill="#c4b5fd" opacity="0.55"/>
+  </g>
+
+  <!-- Larger bright orbs (sharp) -->
+  <circle cx="320"  cy="180" r="2"   fill="#e9d5ff" opacity="0.95"/>
+  <circle cx="680"  cy="95"  r="1.5" fill="#f5d0fe" opacity="0.95"/>
+  <circle cx="1050" cy="220" r="2.5" fill="#ddd6fe" opacity="0.95"/>
+  <circle cx="1380" cy="140" r="2"   fill="#c7d2fe" opacity="0.90"/>
+  <circle cx="1680" cy="260" r="2"   fill="#fbcfe8" opacity="0.90"/>
+  <circle cx="840"  cy="380" r="2"   fill="#a5f3fc" opacity="0.90"/>
+  <circle cx="1560" cy="440" r="2.5" fill="#ddd6fe" opacity="0.90"/>
+  <circle cx="1200" cy="650" r="1.5" fill="#e9d5ff" opacity="0.85"/>
+  <circle cx="720"  cy="900" r="2"   fill="#f5d0fe" opacity="0.85"/>
+  <circle cx="1440" cy="860" r="2.5" fill="#c7d2fe" opacity="0.85"/>
+
+  <!-- Abstract hexagon ring (right side decoration) -->
+  <g transform="translate(1540, 540)" stroke="#8b5cf6" stroke-width="1.5" fill="none" opacity="0.35">
+    <polygon points="0,-120 104,-60 104,60 0,120 -104,60 -104,-60"/>
+    <polygon points="0,-86 75,-43 75,43 0,86 -75,43 -75,-43"/>
+    <polygon points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"/>
+    <line x1="0" y1="-120" x2="0" y2="-86"/>
+    <line x1="104" y1="-60" x2="75" y2="-43"/>
+    <line x1="104" y1="60" x2="75" y2="43"/>
+    <line x1="0" y1="120" x2="0" y2="86"/>
+    <line x1="-104" y1="60" x2="-75" y2="43"/>
+    <line x1="-104" y1="-60" x2="-75" y2="-43"/>
+  </g>
+
+  <!-- Abstract hexagon ring (left top) -->
+  <g transform="translate(300, 320)" stroke="#ec4899" stroke-width="1" fill="none" opacity="0.25">
+    <polygon points="0,-80 69,-40 69,40 0,80 -69,40 -69,-40"/>
+    <polygon points="0,-50 43,-25 43,25 0,50 -43,25 -43,-25"/>
+    <line x1="0" y1="-80" x2="0" y2="-50"/>
+    <line x1="69" y1="-40" x2="43" y2="-25"/>
+    <line x1="69" y1="40" x2="43" y2="25"/>
+    <line x1="0" y1="80" x2="0" y2="50"/>
+    <line x1="-69" y1="40" x2="-43" y2="25"/>
+    <line x1="-69" y1="-40" x2="-43" y2="-25"/>
+  </g>
+
+  <!-- Circuit-like lines (right top area) -->
+  <g stroke="#67e8f9" stroke-width="1" fill="none" opacity="0.20">
+    <path d="M1700,60 L1780,60 L1780,130 L1860,130"/>
+    <path d="M1700,60 L1700,200 L1820,200"/>
+    <circle cx="1700" cy="60"  r="4" fill="#67e8f9"/>
+    <circle cx="1860" cy="130" r="4" fill="#67e8f9"/>
+    <circle cx="1820" cy="200" r="4" fill="#67e8f9"/>
+  </g>
+
+  <!-- Circuit-like lines (left bottom area) -->
+  <g stroke="#a78bfa" stroke-width="1" fill="none" opacity="0.20">
+    <path d="M60,900 L140,900 L140,970 L60,970 L60,1040 L200,1040"/>
+    <circle cx="60"  cy="900"  r="3.5" fill="#a78bfa"/>
+    <circle cx="200" cy="1040" r="3.5" fill="#a78bfa"/>
+  </g>
+</svg>

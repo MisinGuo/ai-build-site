@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbDramaMapper">
+    
+    <resultMap type="GbDrama" id="GbDramaResult">
+        <result property="id"                   column="id"                    />
+        <result property="siteId"               column="site_id"               />
+        <result property="vendorId"             column="vendor_id"             />
+        <result property="name"                 column="name"                  />
+        <result property="subtitle"             column="subtitle"              />
+        <result property="categoryId"           column="category_id"           />
+        <result property="tags"                 column="tags"                  />
+        <result property="coverUrl"             column="cover_url"             />
+        <result property="coverHorizontalUrl"   column="cover_horizontal_url"  />
+        <result property="trailerUrl"           column="trailer_url"           />
+        <result property="description"          column="description"           />
+        <result property="content"              column="content"               />
+        <result property="totalEpisodes"        column="total_episodes"        />
+        <result property="currentEpisodes"      column="current_episodes"      />
+        <result property="freeEpisodes"         column="free_episodes"         />
+        <result property="updateStatus"         column="update_status"         />
+        <result property="episodePrice"         column="episode_price"         />
+        <result property="fullPrice"            column="full_price"            />
+        <result property="unlockType"           column="unlock_type"           />
+        <result property="viewCount"            column="view_count"            />
+        <result property="likeCount"            column="like_count"            />
+        <result property="favoriteCount"        column="favorite_count"        />
+        <result property="rating"               column="rating"                />
+        <result property="director"             column="director"              />
+        <result property="actors"               column="actors"                />
+        <result property="producer"             column="producer"              />
+        <result property="releaseDate"          column="release_date"          />
+        <result property="isNew"                column="is_new"                />
+        <result property="isHot"                column="is_hot"                />
+        <result property="isRecommend"          column="is_recommend"          />
+        <result property="sortOrder"            column="sort_order"            />
+        <result property="status"               column="status"                />
+        <result property="delFlag"              column="del_flag"              />
+        <result property="createBy"             column="create_by"             />
+        <result property="createTime"           column="create_time"           />
+        <result property="updateBy"             column="update_by"             />
+        <result property="updateTime"           column="update_time"           />
+        <result property="remark"               column="remark"                />
+        <result property="categoryName"         column="category_name"         />
+        <result property="categoryIcon"         column="category_icon"         />
+    </resultMap>
+
+    <sql id="selectGbDramaVo">
+        select id, site_id, vendor_id, name, subtitle, category_id, tags, cover_url, cover_horizontal_url, trailer_url, description, content, total_episodes, current_episodes, free_episodes, update_status, episode_price, full_price, unlock_type, view_count, like_count, favorite_count, rating, director, actors, producer, release_date, is_new, is_hot, is_recommend, sort_order, status, del_flag, create_by, create_time, update_by, update_time, remark from gb_dramas
+    </sql>
+
+    <select id="selectGbDramaList" parameterType="GbDrama" resultMap="GbDramaResult">
+        select d.*,
+               c.name as category_name,
+               c.icon as category_icon
+        from gb_dramas d
+        left join gb_categories c on d.category_id = c.id and c.del_flag = '0'
+        <where>
+            d.del_flag = '0'
+            <if test="siteId != null "> and d.site_id = #{siteId}</if>
+            <if test="vendorId != null "> and d.vendor_id = #{vendorId}</if>
+            <if test="name != null  and name != ''"> and d.name like concat('%', #{name}, '%')</if>
+            <if test="categoryId != null "> and d.category_id = #{categoryId}</if>
+            <if test="updateStatus != null  and updateStatus != ''"> and d.update_status = #{updateStatus}</if>
+            <if test="unlockType != null  and unlockType != ''"> and d.unlock_type = #{unlockType}</if>
+            <if test="isNew != null  and isNew != ''"> and d.is_new = #{isNew}</if>
+            <if test="isHot != null  and isHot != ''"> and d.is_hot = #{isHot}</if>
+            <if test="isRecommend != null  and isRecommend != ''"> and d.is_recommend = #{isRecommend}</if>
+            <if test="status != null  and status != ''"> and d.status = #{status}</if>
+        </where>
+        order by d.sort_order asc, d.create_time desc
+    </select>
+    
+    <select id="selectGbDramaById" parameterType="Long" resultMap="GbDramaResult">
+        select d.*, 
+               c.id as category_id,
+               c.name as category_name,
+               c.icon as category_icon
+        from gb_dramas d
+        left join gb_categories c on d.category_id = c.id and c.del_flag = '0'
+        where d.id = #{id} and d.del_flag = '0'
+    </select>
+        
+    <insert id="insertGbDrama" parameterType="GbDrama" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_dramas
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">site_id,</if>
+            <if test="vendorId != null">vendor_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="subtitle != null">subtitle,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="tags != null">tags,</if>
+            <if test="coverUrl != null">cover_url,</if>
+            <if test="coverHorizontalUrl != null">cover_horizontal_url,</if>
+            <if test="trailerUrl != null">trailer_url,</if>
+            <if test="description != null">description,</if>
+            <if test="content != null">content,</if>
+            <if test="totalEpisodes != null">total_episodes,</if>
+            <if test="currentEpisodes != null">current_episodes,</if>
+            <if test="freeEpisodes != null">free_episodes,</if>
+            <if test="updateStatus != null">update_status,</if>
+            <if test="episodePrice != null">episode_price,</if>
+            <if test="fullPrice != null">full_price,</if>
+            <if test="unlockType != null">unlock_type,</if>
+            <if test="viewCount != null">view_count,</if>
+            <if test="likeCount != null">like_count,</if>
+            <if test="favoriteCount != null">favorite_count,</if>
+            <if test="rating != null">rating,</if>
+            <if test="director != null">director,</if>
+            <if test="actors != null">actors,</if>
+            <if test="producer != null">producer,</if>
+            <if test="releaseDate != null">release_date,</if>
+            <if test="isNew != null">is_new,</if>
+            <if test="isHot != null">is_hot,</if>
+            <if test="isRecommend != null">is_recommend,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">#{siteId},</if>
+            <if test="vendorId != null">#{vendorId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="subtitle != null">#{subtitle},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="tags != null">#{tags},</if>
+            <if test="coverUrl != null">#{coverUrl},</if>
+            <if test="coverHorizontalUrl != null">#{coverHorizontalUrl},</if>
+            <if test="trailerUrl != null">#{trailerUrl},</if>
+            <if test="description != null">#{description},</if>
+            <if test="content != null">#{content},</if>
+            <if test="totalEpisodes != null">#{totalEpisodes},</if>
+            <if test="currentEpisodes != null">#{currentEpisodes},</if>
+            <if test="freeEpisodes != null">#{freeEpisodes},</if>
+            <if test="updateStatus != null">#{updateStatus},</if>
+            <if test="episodePrice != null">#{episodePrice},</if>
+            <if test="fullPrice != null">#{fullPrice},</if>
+            <if test="unlockType != null">#{unlockType},</if>
+            <if test="viewCount != null">#{viewCount},</if>
+            <if test="likeCount != null">#{likeCount},</if>
+            <if test="favoriteCount != null">#{favoriteCount},</if>
+            <if test="rating != null">#{rating},</if>
+            <if test="director != null">#{director},</if>
+            <if test="actors != null">#{actors},</if>
+            <if test="producer != null">#{producer},</if>
+            <if test="releaseDate != null">#{releaseDate},</if>
+            <if test="isNew != null">#{isNew},</if>
+            <if test="isHot != null">#{isHot},</if>
+            <if test="isRecommend != null">#{isRecommend},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbDrama" parameterType="GbDrama">
+        update gb_dramas
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="vendorId != null">vendor_id = #{vendorId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="subtitle != null">subtitle = #{subtitle},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="tags != null">tags = #{tags},</if>
+            <if test="coverUrl != null">cover_url = #{coverUrl},</if>
+            <if test="coverHorizontalUrl != null">cover_horizontal_url = #{coverHorizontalUrl},</if>
+            <if test="trailerUrl != null">trailer_url = #{trailerUrl},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="totalEpisodes != null">total_episodes = #{totalEpisodes},</if>
+            <if test="currentEpisodes != null">current_episodes = #{currentEpisodes},</if>
+            <if test="freeEpisodes != null">free_episodes = #{freeEpisodes},</if>
+            <if test="updateStatus != null">update_status = #{updateStatus},</if>
+            <if test="episodePrice != null">episode_price = #{episodePrice},</if>
+            <if test="fullPrice != null">full_price = #{fullPrice},</if>
+            <if test="unlockType != null">unlock_type = #{unlockType},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="likeCount != null">like_count = #{likeCount},</if>
+            <if test="favoriteCount != null">favorite_count = #{favoriteCount},</if>
+            <if test="rating != null">rating = #{rating},</if>
+            <if test="director != null">director = #{director},</if>
+            <if test="actors != null">actors = #{actors},</if>
+            <if test="producer != null">producer = #{producer},</if>
+            <if test="releaseDate != null">release_date = #{releaseDate},</if>
+            <if test="isNew != null">is_new = #{isNew},</if>
+            <if test="isHot != null">is_hot = #{isHot},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteGbDramaById" parameterType="Long">
+        update gb_dramas set del_flag = '2' where id = #{id}
+    </update>
+
+    <update id="deleteGbDramaByIds" parameterType="String">
+        update gb_dramas set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

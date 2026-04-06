@@ -1,0 +1,169 @@
+{
+  "status": "ok",
+  "info": "ok",
+  "data": {
+    "userinfo": {
+      "uid": "6486",
+      "gh_type": "1",
+      "tgid": "dd0038708",
+      "username": "cps_1759204528bv",
+      "nickname": "郭名胜",
+      "password": "b8fccd7de21b488816c8254298cd9e88",
+      "g_pwd": null,
+      "tx_pwd": "",
+      "email": null,
+      "mobile": null,
+      "qq": null,
+      "addtime": "1759204528",
+      "lastloginip": "145.132.101.192",
+      "lastlogintime": "1772695968",
+      "pid": "5361",
+      "can_fee": "1",
+      "rate": "0",
+      "ios_rate": "0",
+      "a_id": "1104",
+      "gh_level": "4",
+      "table_suffix": "",
+      "manual_ghlevel": "0",
+      "can_readgonggao": "0",
+      "tixian_total": "0.00",
+      "cps_fee_total": "187.56",
+      "cps_fee_total_freezed": "187.56",
+      "pay_total": "375.20",
+      "status_c": "0000000000",
+      "is_shield": "0",
+      "tg_type": "is_common",
+      "level": "3",
+      "remark": "网站",
+      "contact": "",
+      "idcard": "",
+      "tg_area": "1",
+      "open_personal_app": "0",
+      "open_coupon": "0",
+      "can_push_other_game": "0",
+      "deny_tixian": "0",
+      "is_dc": "0",
+      "ptb": "0.00",
+      "extend_control": null,
+      "sign_code": "0",
+      "open_discount01": "0",
+      "allow_tixian": "0",
+      "wxgame_cps": null,
+      "wxgame_channel_id": null,
+      "is_dl": 0,
+      "open_share_menu": 1
+    },
+    "open_share_menu": 1,
+    "left_menu_init": [
+      {
+        "title": "首页",
+        "menu": {
+          "question": "常见问题"
+        },
+        "module_name": "Cpsindex",
+        "style": [
+          "",
+          "none"
+        ]
+      },
+      {
+        "title": "数据管理",
+        "menu": {
+          "data_summary": "数据汇总",
+          "reglist": "注册明细",
+          "paylist": "充值明细"
+        },
+        "module_name": "Cpsbtgame",
+        "style": [
+          "",
+          "none"
+        ]
+      },
+      {
+        "title": "辅助工具",
+        "menu": {
+          "rebate_activity": "返利/活动"
+        },
+        "module_name": "Cpsbtgame",
+        "style": [
+          "",
+          "none"
+        ]
+      },
+      {
+        "title": "账户管理",
+        "menu": {
+          "usercenter": "个人中心"
+        },
+        "module_name": "Cpsindex",
+        "style": [
+          "",
+          "none"
+        ]
+      }
+    ],
+    "p_userinfo": {
+      "uid": "5361",
+      "gh_type": "2",
+      "tgid": "dd00387",
+      "username": "gh_dd00387",
+      "nickname": "gh_dd00387",
+      "password": "8a6f2805b4515ac12058e79e66539be9",
+      "g_pwd": "22a447b2b2ad7ff440ee66a0845a944b",
+      "tx_pwd": "b8fccd7de21b488816c8254298cd9e88",
+      "email": "",
+      "mobile": "15639083891",
+      "qq": "",
+      "addtime": "1669883009",
+      "lastloginip": "123.52.16.59",
+      "lastlogintime": "1772169075",
+      "pid": "0",
+      "can_fee": "0",
+      "rate": "0",
+      "ios_rate": "0",
+      "a_id": "1104",
+      "gh_level": "4",
+      "table_suffix": "dd",
+      "manual_ghlevel": "1",
+      "can_readgonggao": "1",
+      "tixian_total": "154798.00",
+      "cps_fee_total": "206322.09",
+      "cps_fee_total_freezed": "22027.34",
+      "pay_total": "427291.44",
+      "status_c": "0000000000",
+      "is_shield": "0",
+      "tg_type": "is_common",
+      "level": "5",
+      "remark": "",
+      "contact": "谭自杰",
+      "idcard": "412822198608254487",
+      "tg_area": "1",
+      "open_personal_app": "0",
+      "open_coupon": "0",
+      "can_push_other_game": "0",
+      "deny_tixian": "0",
+      "is_dc": "0",
+      "ptb": "0.00",
+      "extend_control": "{\"f1\":0}",
+      "sign_code": "0",
+      "open_discount01": "1",
+      "allow_tixian": "0",
+      "wxgame_cps": null,
+      "wxgame_channel_id": null,
+      "is_dl": 0
+    },
+    "game_type_arr": {
+      "1": "BT手游",
+      "3": "H5游戏",
+      "2": "官服手游"
+    },
+    "reglink": "https://www.277sy.com/t-dd0038708.html",
+    "reglink2": "https://mob.277sy.com/t-dd0038708.html",
+    "reglink3": "https://www.277sy.com/wx-dd0038708.html",
+    "shortlink": "https://www.277sy.com/?tgid=dd0038708",
+    "shortlink2": "https://mob.277sy.com/?tgid=dd0038708",
+    "reglink4": "https://mobapp.277sy.com/?tgid=dd0038708",
+    "reglink5": "https://reg.277sy.com/?tgid=dd0038708"
+  },
+  "crawl_time": "2026-03-05T15:32:48.352343"
+}

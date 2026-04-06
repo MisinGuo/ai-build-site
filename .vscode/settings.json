@@ -1,0 +1,40 @@
+{
+    "python-envs.defaultEnvManager": "ms-python.python:conda",
+    "python-envs.defaultPackageManager": "ms-python.python:conda",
+    "python-envs.pythonProjects": [],
+    
+    // Java 开发环境配置
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-1.8",
+            "path": "C:/Users/Misin/.jdks/corretto-1.8.0_472",
+            "default": true
+        }
+    ],
+    "java.jdt.ls.java.home": "C:/Users/Misin/.jdks/corretto-1.8.0_472",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.debug.settings.hotCodeReplace": "auto",
+    "java.autobuild.enabled": true,
+    
+    // Maven 配置
+    "java.import.maven.enabled": true,
+    "maven.terminal.useJavaHome": true,
+    "maven.executable.preferMavenWrapper": true,
+    "maven.terminal.customEnv": [
+        {
+            "environmentVariable": "JAVA_HOME",
+            "value": "C:/Users/Misin/.jdks/corretto-1.8.0_472"
+        }
+    ],
+    
+    // Spring Boot 开发配置
+    "spring-boot.ls.java.home": "C:/Users/Misin/.jdks/corretto-1.8.0_472",
+    
+    // 终端环境变量
+    "terminal.integrated.env.windows": {
+        "JAVA_HOME": "C:/Users/Misin/.jdks/corretto-1.8.0_472",
+        "PATH": "C:/Users/Misin/.jdks/corretto-1.8.0_472/bin;${env:PATH}"
+    },
+    "java.format.settings.url": ".vscode/java-formatter.xml"
+}

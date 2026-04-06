@@ -1,0 +1,55 @@
+{
+  "platform": "dongyouxi",
+  "crawl_time": "2026-03-05T15:35:29.695320",
+  "total_count": 674,
+  "items": [    
+    {
+      "图片链接": "https://sysimage.tsyule.cn/2026/03/11/69b12e208b5c4.png",
+      "游戏名": "群英风华录",
+      "版本": "",
+      "客户端": "Android/IOS",
+      "游戏分类": "卡牌.三国",
+      "手游类型": "官方手游",
+      "折扣": "10.00",
+      "gameid": "15999",
+      "安卓端链接": "https://download.tsyule.cn//index.php/index/down/gameid/15999/tgid/hb1080814",
+      "IOS端链接": "https://webapp.tsyule.cn/?tgid=hb1080814&fix_home=no#/game/info/15999",
+      "推广地址": "https://gweb.tsyule.cn/gameinfo-15999-hb1080814.html",
+      "安卓端链接2": "https://g.chaoai168.com/15999-hb1080814-1.html",
+      "IOS端链接2": "https://web.chaoai168.com/?tgid=hb1080814&fix_home=no#/game/info/15999",
+      "推广地址2": "https://gweb.chaoai168.com/gameinfo-15999-hb1080814.html",
+      "screenshots": [
+        "https://sysimage.tsyule.cn/2026/03/11/69b12e208b999.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b12e208bfc8.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b12e208c603.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b12e208ccda.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b12e208d37d.jpg"
+      ],
+      "video_url": "https://adown2.tsyule.cn/game/android/qyfhlcgyx/qyfhlcgyx.mp4"
+    },
+    {
+      "图片链接": "https://sysimage.tsyule.cn/2026/03/11/69b0ff7c83c0e.png",
+      "游戏名": "九州八荒录",
+      "版本": "0.1折1W免费版",
+      "客户端": "Android/IOS",
+      "游戏分类": "角色.仙侠",
+      "手游类型": "官方手游",
+      "折扣": "0.10",
+      "gameid": "15959",
+      "安卓端链接": "https://download.tsyule.cn//index.php/index/down/gameid/15959/tgid/hb1080814",
+      "IOS端链接": "https://webapp.tsyule.cn/?tgid=hb1080814&fix_home=no#/game/info/15959",
+      "推广地址": "https://gweb.tsyule.cn/gameinfo-15959-hb1080814.html",
+      "安卓端链接2": "https://g.chaoai168.com/15959-hb1080814-1.html",
+      "IOS端链接2": "https://web.chaoai168.com/?tgid=hb1080814&fix_home=no#/game/info/15959",
+      "推广地址2": "https://gweb.chaoai168.com/gameinfo-15959-hb1080814.html",
+      "screenshots": [
+        "https://sysimage.tsyule.cn/2026/03/11/69b0ff7c83eea.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b0ff7c842fb.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b0ff7c84707.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b0ff7c84952.jpg",
+        "https://sysimage.tsyule.cn/2026/03/11/69b0ff7c84ba8.jpg"
+      ],
+      "video_url": "https://adown2.tsyule.cn/game/android/jiuhul/jiuhul.mp4"
+    }
+  ]
+}

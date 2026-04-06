@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbMultilangStorageConfigMapper">
+    
+    <resultMap type="GbMultilangStorageConfig" id="GbMultilangStorageConfigResult">
+        <result property="id"    column="id"    />
+        <result property="langCode"    column="lang_code"    />
+        <result property="langName"    column="lang_name"    />
+        <result property="storageType"    column="storage_type"    />
+        <result property="storageConfig"    column="storage_config"    />
+        <result property="basePath"    column="base_path"    />
+        <result property="isDefault"    column="is_default"    />
+        <result property="status"    column="status"    />
+        <result property="priority"    column="priority"    />
+        <result property="lastTestAt"    column="last_test_at"    />
+        <result property="lastTestResult"    column="last_test_result"    />
+        <result property="testMessage"    column="test_message"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectGbMultilangStorageConfigVo">
+        select id, lang_code, lang_name, storage_type, storage_config, base_path, is_default, 
+               status, priority, last_test_at, last_test_result, test_message, del_flag, 
+               create_by, create_time, update_by, update_time, remark 
+        from gb_multilang_storage_configs
+    </sql>
+
+    <select id="selectGbMultilangStorageConfigList" parameterType="GbMultilangStorageConfig" resultMap="GbMultilangStorageConfigResult">
+        <include refid="selectGbMultilangStorageConfigVo"/>
+        <where>  
+            del_flag = '0'
+            <if test="langCode != null and langCode != ''"> and lang_code like concat('%', #{langCode}, '%')</if>
+            <if test="langName != null and langName != ''"> and lang_name like concat('%', #{langName}, '%')</if>
+            <if test="storageType != null and storageType != ''"> and storage_type = #{storageType}</if>
+            <if test="isDefault != null and isDefault != ''"> and is_default = #{isDefault}</if>
+            <if test="status != null and status != ''"> and status = #{status}</if>
+            <if test="lastTestResult != null and lastTestResult != ''"> and last_test_result = #{lastTestResult}</if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                and date_format(create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                and date_format(create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+        </where>
+        order by priority asc, lang_code asc, create_time desc
+    </select>
+    
+    <select id="selectGbMultilangStorageConfigById" parameterType="Long" resultMap="GbMultilangStorageConfigResult">
+        <include refid="selectGbMultilangStorageConfigVo"/>
+        where id = #{id} and del_flag = '0'
+    </select>
+
+    <select id="selectGbMultilangStorageConfigByLangCode" parameterType="String" resultMap="GbMultilangStorageConfigResult">
+        <include refid="selectGbMultilangStorageConfigVo"/>
+        where lang_code = #{langCode} and del_flag = '0' and status = '1'
+        limit 1
+    </select>
+
+    <select id="selectEnabledStorageConfigs" resultMap="GbMultilangStorageConfigResult">
+        <include refid="selectGbMultilangStorageConfigVo"/>
+        where del_flag = '0' and status = '1'
+        order by priority asc, lang_code asc
+    </select>
+
+    <select id="selectDefaultStorageConfig" resultMap="GbMultilangStorageConfigResult">
+        <include refid="selectGbMultilangStorageConfigVo"/>
+        where del_flag = '0' and status = '1' and is_default = '1'
+        limit 1
+    </select>
+
+    <select id="checkLangCodeExists" resultType="Boolean">
+        select count(1) from gb_multilang_storage_configs 
+        where lang_code = #{langCode} and del_flag = '0'
+        <if test="excludeId != null">
+            and id != #{excludeId}
+        </if>
+        limit 1
+    </select>
+        
+    <insert id="insertGbMultilangStorageConfig" parameterType="GbMultilangStorageConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_multilang_storage_configs
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="langCode != null and langCode != ''">lang_code,</if>
+            <if test="langName != null">lang_name,</if>
+            <if test="storageType != null">storage_type,</if>
+            <if test="storageConfig != null">storage_config,</if>
+            <if test="basePath != null">base_path,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="status != null">status,</if>
+            <if test="priority != null">priority,</if>
+            <if test="lastTestAt != null">last_test_at,</if>
+            <if test="lastTestResult != null">last_test_result,</if>
+            <if test="testMessage != null">test_message,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="langCode != null and langCode != ''">#{langCode},</if>
+            <if test="langName != null">#{langName},</if>
+            <if test="storageType != null">#{storageType},</if>
+            <if test="storageConfig != null">#{storageConfig},</if>
+            <if test="basePath != null">#{basePath},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="status != null">#{status},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="lastTestAt != null">#{lastTestAt},</if>
+            <if test="lastTestResult != null">#{lastTestResult},</if>
+            <if test="testMessage != null">#{testMessage},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbMultilangStorageConfig" parameterType="GbMultilangStorageConfig">
+        update gb_multilang_storage_configs
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="langCode != null and langCode != ''">lang_code = #{langCode},</if>
+            <if test="langName != null">lang_name = #{langName},</if>
+            <if test="storageType != null">storage_type = #{storageType},</if>
+            <if test="storageConfig != null">storage_config = #{storageConfig},</if>
+            <if test="basePath != null">base_path = #{basePath},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="lastTestAt != null">last_test_at = #{lastTestAt},</if>
+            <if test="lastTestResult != null">last_test_result = #{lastTestResult},</if>
+            <if test="testMessage != null">test_message = #{testMessage},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="clearDefaultFlag">
+        update gb_multilang_storage_configs set is_default = '0' where del_flag = '0'
+    </update>
+
+    <delete id="deleteGbMultilangStorageConfigById" parameterType="Long">
+        update gb_multilang_storage_configs set del_flag = '2' where id = #{id}
+    </delete>
+
+    <delete id="deleteGbMultilangStorageConfigByIds" parameterType="String">
+        update gb_multilang_storage_configs set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

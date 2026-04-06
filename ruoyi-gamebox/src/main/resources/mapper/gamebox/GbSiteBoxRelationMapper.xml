@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteBoxRelationMapper">
+    
+    <resultMap type="GbSiteBoxRelation" id="GbSiteBoxRelationResult">
+        <result property="id" column="id"/>
+        <result property="siteId" column="site_id"/>
+        <result property="boxId" column="box_id"/>
+        <result property="relationType" column="relation_type"/>
+        <result property="isVisible" column="is_visible"/>
+        <result property="isFeatured" column="is_featured"/>
+        <result property="customName" column="custom_name"/>
+        <result property="customDescription" column="custom_description"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="viewCount" column="view_count"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="siteName" column="site_name"/>
+        <result property="boxName" column="box_name"/>
+        <result property="boxSlug" column="box_slug"/>
+        <result property="boxCoverImage" column="box_cover_image"/>
+        <result property="boxType" column="box_type"/>
+    </resultMap>
+
+    <sql id="selectGbSiteBoxRelationVo">
+        select id, site_id, box_id, is_visible, is_featured, custom_name, custom_description, sort_order, view_count, remark, create_by, create_time, update_by, update_time from gb_site_box_relations
+    </sql>
+
+    <select id="selectGbSiteBoxRelationList" parameterType="GbSiteBoxRelation" resultMap="GbSiteBoxRelationResult">
+        <include refid="selectGbSiteBoxRelationVo"/>
+        <where>  
+            <if test="siteId != null">and site_id = #{siteId}</if>
+            <if test="boxId != null">and box_id = #{boxId}</if>
+            <if test="isVisible != null and isVisible != ''">and is_visible = #{isVisible}</if>
+            <if test="isFeatured != null and isFeatured != ''">and is_featured = #{isFeatured}</if>
+        </where>
+        order by sort_order, id
+    </select>
+    
+    <select id="selectGbSiteBoxRelationById" parameterType="Long" resultMap="GbSiteBoxRelationResult">
+        <include refid="selectGbSiteBoxRelationVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectBoxesBySiteId" parameterType="Long" resultMap="GbSiteBoxRelationResult">
+        select 
+            r.id, r.site_id, r.box_id, r.relation_type, r.is_visible, r.is_featured, r.custom_name, r.custom_description, r.sort_order, r.view_count,
+            b.name as box_name, b.slug as box_slug, b.cover_image as box_cover_image, b.type as box_type
+        from gb_site_box_relations r
+        inner join gb_game_boxes b on r.box_id = b.id
+        where r.site_id = #{siteId}
+        order by r.sort_order, r.id
+    </select>
+
+    <select id="selectSitesByBoxId" parameterType="Long" resultMap="GbSiteBoxRelationResult">
+        select 
+            r.id, r.site_id, r.box_id, r.relation_type, r.is_visible, r.is_featured, r.custom_name, r.custom_description, r.sort_order, r.view_count,
+            w.name as site_name
+        from gb_site_box_relations r
+        inner join gb_sites w on r.site_id = w.id
+        where r.box_id = #{boxId}
+        order by r.sort_order, r.id
+    </select>
+
+    <select id="checkRelationExists" resultType="int">
+        select count(*) from gb_site_box_relations
+        where site_id = #{siteId} and box_id = #{boxId}
+    </select>
+    
+    <select id="checkRelationExistsByType" resultType="int">
+        select count(*) from gb_site_box_relations
+        where site_id = #{siteId} and box_id = #{boxId} and relation_type = #{relationType}
+    </select>
+
+    <insert id="insertGbSiteBoxRelation" parameterType="GbSiteBoxRelation" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_site_box_relations (
+            site_id,
+            box_id,
+            relation_type,
+            <if test="isVisible != null">is_visible,</if>
+            <if test="isFeatured != null">is_featured,</if>
+            <if test="customName != null">custom_name,</if>
+            <if test="customDescription != null">custom_description,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="viewCount != null">view_count,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time</if>
+        ) values (
+            #{siteId},
+            #{boxId},
+            <choose>
+                <when test="relationType != null">#{relationType}</when>
+                <otherwise>'include'</otherwise>
+            </choose>,
+            <if test="isVisible != null">#{isVisible},</if>
+            <if test="isFeatured != null">#{isFeatured},</if>
+            <if test="customName != null">#{customName},</if>
+            <if test="customDescription != null">#{customDescription},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="viewCount != null">#{viewCount},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime}</if>
+        )
+    </insert>
+
+    <insert id="batchInsertGbSiteBoxRelation">
+        insert into gb_site_box_relations(site_id, box_id, is_visible, is_featured, sort_order, view_count, relation_type, create_by, create_time)
+        values
+        <foreach collection="relations" item="item" separator=",">
+            (#{item.siteId}, #{item.boxId}, #{item.isVisible}, #{item.isFeatured}, #{item.sortOrder}, #{item.viewCount}, #{item.relationType}, #{item.createBy}, #{item.createTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE 
+            relation_type = VALUES(relation_type),
+            is_visible = VALUES(is_visible),
+            update_time = NOW()
+    </insert>
+
+    <update id="updateGbSiteBoxRelation" parameterType="GbSiteBoxRelation">
+        update gb_site_box_relations
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="isVisible != null">is_visible = #{isVisible},</if>
+            <if test="isFeatured != null">is_featured = #{isFeatured},</if>
+            <if test="customName != null">custom_name = #{customName},</if>
+            <if test="customDescription != null">custom_description = #{customDescription},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="viewCount != null">view_count = #{viewCount},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateVisibilityBySiteIdAndBoxId">
+        update gb_site_box_relations
+        set is_visible = #{isVisible},
+            update_time = NOW()
+        where site_id = #{siteId} and box_id = #{boxId}
+    </update>
+
+    <update id="updateConfigBySiteIdAndBoxId">
+        update gb_site_box_relations
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="relation.isVisible != null">is_visible = #{relation.isVisible},</if>
+            <if test="relation.isFeatured != null">is_featured = #{relation.isFeatured},</if>
+            <if test="relation.customName != null">custom_name = #{relation.customName},</if>
+            <if test="relation.customDescription != null">custom_description = #{relation.customDescription},</if>
+            <if test="relation.sortOrder != null">sort_order = #{relation.sortOrder},</if>
+            update_time = NOW(),
+        </trim>
+        where site_id = #{siteId} and box_id = #{boxId} and relation_type = 'include'
+    </update>
+
+    <update id="incrementViewCount">
+        update gb_site_box_relations set view_count = view_count + 1
+        where site_id = #{siteId} and box_id = #{boxId}
+    </update>
+
+    <delete id="deleteGbSiteBoxRelationById" parameterType="Long">
+        delete from gb_site_box_relations where id = #{id}
+    </delete>
+
+    <delete id="deleteGbSiteBoxRelationsBySiteId">
+        delete from gb_site_box_relations where site_id = #{siteId}
+    </delete>
+
+    <delete id="deleteGbSiteBoxRelationsByBoxId">
+        delete from gb_site_box_relations where box_id = #{boxId}
+    </delete>
+
+    <delete id="deleteGbSiteBoxRelation">
+        delete from gb_site_box_relations 
+        where site_id = #{siteId} and box_id = #{boxId}
+        <if test="relationType != null and relationType != ''">
+            and relation_type = #{relationType}
+        </if>
+    </delete>
+
+    <delete id="deleteGbSiteBoxRelationByIds" parameterType="String">
+        delete from gb_site_box_relations where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- ==================== 排除管理相关 ==================== -->
+    
+    <select id="checkExcludeRelationExists" resultType="int">
+        select count(*) from gb_site_box_relations
+        where site_id = #{siteId} and box_id = #{boxId} and relation_type = 'exclude'
+    </select>
+    
+    <delete id="deleteExcludeRelation">
+        delete from gb_site_box_relations 
+        where site_id = #{siteId} and box_id = #{boxId} and relation_type = 'exclude'
+    </delete>
+    
+    <!-- 查询某个盒子被哪些网站排除 -->
+    <select id="selectExcludedSiteIds" resultType="Long">
+        select site_id from gb_site_box_relations
+        where box_id = #{boxId}
+        and relation_type = 'exclude'
+    </select>
+    
+    <!-- 批量删除某个盒子在多个网站的排除关联 -->
+    <delete id="batchDeleteExcludeRelations">
+        delete from gb_site_box_relations
+        where box_id = #{boxId}
+        and relation_type = 'exclude'
+        and site_id in
+        <foreach item="id" collection="siteIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 批量删除：对给定 boxIds+relationType，删除不在 keepSiteIds 中的网站关联 -->
+    <delete id="deleteByBoxIdsAndTypeExcluding">
+        DELETE FROM gb_site_box_relations
+        WHERE box_id IN
+        <foreach collection="boxIds" item="id" open="(" separator="," close=")">#{id}</foreach>
+        AND relation_type = #{relationType}
+        <if test="keepSiteIds != null and keepSiteIds.size() &gt; 0">
+        AND site_id NOT IN
+        <foreach collection="keepSiteIds" item="sid" open="(" separator="," close=")">#{sid}</foreach>
+        </if>
+    </delete>
+
+</mapper>

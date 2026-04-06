@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteMapper">
+    
+    <resultMap type="GbSite" id="GbSiteResult">
+        <result property="id"                column="id"                 />
+        <result property="name"              column="name"               />
+        <result property="code"              column="code"               />
+        <result property="categoryId"        column="category_id"        />
+        <result property="categoryName"      column="category_name"      />
+        <result property="categoryIcon"      column="category_icon"      />
+        <result property="domain"            column="domain"             />
+        <result property="siteType"          column="site_type"          />
+        <result property="logoUrl"           column="logo_url"           />
+        <result property="faviconUrl"        column="favicon_url"        />
+        <result property="description"       column="description"        />
+        <result property="seoTitle"          column="seo_title"          />
+        <result property="seoKeywords"       column="seo_keywords"       />
+        <result property="seoDescription"    column="seo_description"    />
+        <result property="config"            column="config"             />
+        <result property="storageConfigId"   column="storage_config_id"  />
+        <result property="defaultLocale"     column="default_locale"     />
+        <result property="supportedLocales"  column="supported_locales"  />
+        <result property="i18nMode"          column="i18n_mode"          />
+        <result property="sortOrder"         column="sort_order"         />
+        <result property="status"            column="status"             />
+        <result property="delFlag"           column="del_flag"           />
+        <result property="createBy"          column="create_by"          />
+        <result property="createTime"        column="create_time"        />
+        <result property="updateBy"          column="update_by"          />
+        <result property="updateTime"        column="update_time"        />
+        <result property="remark"            column="remark"             />
+        <result property="isPersonal"        column="is_personal"        />
+        <result property="isDefault"         column="is_default"         />
+        <result property="siteFunctionType"  column="site_function_type" />
+        <result property="setupStatus"       column="setup_status"       />
+        <result property="templateId"        column="template_id"        />
+    </resultMap>
+
+    <sql id="selectGbSiteVo">
+        select id, name, code, category_id, domain, site_type, site_function_type, setup_status, template_id,
+               logo_url, favicon_url, description,
+               seo_title, seo_keywords, seo_description, config, storage_config_id,
+               default_locale, supported_locales, i18n_mode,
+               sort_order, status, del_flag, create_by, create_time, update_by, update_time, remark
+        from gb_sites
+    </sql>
+
+    <select id="selectGbSiteList" parameterType="GbSite" resultMap="GbSiteResult">
+        select s.id, s.name, s.code, s.category_id, c.name as category_name, c.icon as category_icon, 
+               s.domain, s.site_type, s.site_function_type, s.setup_status, s.template_id,
+               s.logo_url, s.favicon_url, s.description, s.seo_title, 
+               s.seo_keywords, s.seo_description, s.config, s.storage_config_id, s.default_locale, 
+               s.supported_locales, s.i18n_mode, s.is_personal,
+               s.sort_order, s.status, s.del_flag, s.create_by, 
+               s.create_time, s.update_by, s.update_time, s.remark 
+        from gb_sites s
+        left join gb_categories c on s.category_id = c.id and c.del_flag = '0'
+        <where>
+            s.del_flag = '0'
+            <if test="name != null  and name != ''"> and s.name like concat('%', #{name}, '%')</if>
+            <if test="code != null  and code != ''"> and s.code = #{code}</if>
+            <if test="categoryId != null"> and s.category_id = #{categoryId}</if>
+            <if test="domain != null  and domain != ''"> and s.domain like concat('%', #{domain}, '%')</if>
+            <if test="siteType != null  and siteType != ''"> and s.site_type = #{siteType}</if>
+            <if test="status != null  and status != ''"> and s.status = #{status}</if>
+        </where>
+        order by s.sort_order asc, s.create_time desc
+    </select>
+
+    <!-- 按用户过滤：只返回该用户有权限访问的站点，并带出 is_default 标志 -->
+    <select id="selectGbSiteListByUserId" resultMap="GbSiteResult">
+        select s.id, s.name, s.code, s.category_id, c.name as category_name, c.icon as category_icon,
+               s.domain, s.site_type, s.site_function_type, s.setup_status, s.template_id,
+               s.logo_url, s.favicon_url, s.description, s.seo_title,
+               s.seo_keywords, s.seo_description, s.config, s.storage_config_id, s.default_locale,
+               s.supported_locales, s.i18n_mode, s.is_personal,
+               s.sort_order, s.status, s.del_flag, s.create_by,
+               s.create_time, s.update_by, s.update_time, s.remark,
+               r.is_default
+        from gb_sites s
+        inner join gb_user_site_relation r on r.site_id = s.id and r.user_id = #{userId}
+        left join gb_categories c on s.category_id = c.id and c.del_flag = '0'
+        <where>
+            s.del_flag = '0'
+            <if test="site.name != null and site.name != ''"> and s.name like concat('%', #{site.name}, '%')</if>
+            <if test="site.code != null and site.code != ''"> and s.code = #{site.code}</if>
+            <if test="site.categoryId != null"> and s.category_id = #{site.categoryId}</if>
+            <if test="site.domain != null and site.domain != ''"> and s.domain like concat('%', #{site.domain}, '%')</if>
+            <if test="site.siteType != null and site.siteType != ''"> and s.site_type = #{site.siteType}</if>
+            <if test="site.status != null and site.status != ''"> and s.status = #{site.status}</if>
+        </where>
+        order by r.is_default desc, s.sort_order asc, s.create_time desc
+    </select>
+    
+    <select id="selectGbSiteById" parameterType="Long" resultMap="GbSiteResult">
+        <include refid="selectGbSiteVo"/>
+        where id = #{id} and del_flag = '0'
+    </select>
+
+    <select id="checkDomainUnique" parameterType="String" resultMap="GbSiteResult">
+        <include refid="selectGbSiteVo"/>
+        where domain = #{domain} and del_flag = '0' limit 1
+    </select>
+
+    <!-- 新增用户-站点关联 -->
+    <insert id="insertUserSiteRelation">
+        insert ignore into gb_user_site_relation (user_id, site_id, is_default)
+        values (#{userId}, #{siteId}, #{isDefault})
+    </insert>
+
+    <!-- 查询与指定站点有关联的任意用户ID（用于从该用户查找个人默认站点） -->
+    <select id="selectAnyUserIdBySiteId" parameterType="Long" resultType="java.lang.Long">
+        SELECT r.user_id FROM gb_user_site_relation r WHERE r.site_id = #{siteId} LIMIT 1
+    </select>
+
+    <!-- 查询用户个人默认站点 ID
+         优先级：用户关联表中 is_default=1 的属个人站 > 用户关联表中任意个人站
+         不再回退到全局个人站（避免多用户数据串流）
+    -->
+    <select id="selectPersonalSiteIdByUserId" parameterType="Long" resultType="java.lang.Long">
+        SELECT COALESCE(
+            (SELECT r.site_id FROM gb_user_site_relation r
+             WHERE r.user_id = #{userId} AND r.is_default = 1 LIMIT 1),
+            (SELECT r.site_id FROM gb_user_site_relation r
+             INNER JOIN gb_sites s ON s.id = r.site_id AND s.is_personal = 1 AND s.del_flag = '0'
+             WHERE r.user_id = #{userId} LIMIT 1)
+        )
+    </select>
+        
+    <insert id="insertGbSite" parameterType="GbSite" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_sites
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="domain != null and domain != ''">domain,</if>
+            <if test="siteType != null and siteType != ''">site_type,</if>
+            <if test="logoUrl != null">logo_url,</if>
+            <if test="faviconUrl != null">favicon_url,</if>
+            <if test="description != null">description,</if>
+            <if test="seoTitle != null">seo_title,</if>
+            <if test="seoKeywords != null">seo_keywords,</if>
+            <if test="seoDescription != null">seo_description,</if>
+            <if test="config != null">config,</if>
+            <if test="storageConfigId != null">storage_config_id,</if>
+            <if test="defaultLocale != null">default_locale,</if>
+            <if test="supportedLocales != null">supported_locales,</if>
+            <if test="i18nMode != null">i18n_mode,</if>
+            <if test="isPersonal != null">is_personal,</if>
+            <if test="siteFunctionType != null">site_function_type,</if>
+            <if test="setupStatus != null">setup_status,</if>
+            <if test="templateId != null">template_id,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="domain != null and domain != ''">#{domain},</if>
+            <if test="siteType != null and siteType != ''">#{siteType},</if>
+            <if test="logoUrl != null">#{logoUrl},</if>
+            <if test="faviconUrl != null">#{faviconUrl},</if>
+            <if test="description != null">#{description},</if>
+            <if test="seoTitle != null">#{seoTitle},</if>
+            <if test="seoKeywords != null">#{seoKeywords},</if>
+            <if test="seoDescription != null">#{seoDescription},</if>
+            <if test="config != null">#{config},</if>
+            <if test="storageConfigId != null">#{storageConfigId},</if>
+            <if test="defaultLocale != null">#{defaultLocale},</if>
+            <if test="supportedLocales != null">#{supportedLocales},</if>
+            <if test="i18nMode != null">#{i18nMode},</if>
+            <if test="isPersonal != null">#{isPersonal},</if>
+            <if test="siteFunctionType != null">#{siteFunctionType},</if>
+            <if test="setupStatus != null">#{setupStatus},</if>
+            <if test="templateId != null">#{templateId},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbSite" parameterType="GbSite">
+        update gb_sites
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="domain != null and domain != ''">domain = #{domain},</if>
+            <if test="siteType != null and siteType != ''">site_type = #{siteType},</if>
+            <if test="logoUrl != null">logo_url = #{logoUrl},</if>
+            <if test="faviconUrl != null">favicon_url = #{faviconUrl},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="seoTitle != null">seo_title = #{seoTitle},</if>
+            <if test="seoKeywords != null">seo_keywords = #{seoKeywords},</if>
+            <if test="seoDescription != null">seo_description = #{seoDescription},</if>
+            <if test="config != null">config = #{config},</if>
+            <if test="storageConfigId != null">storage_config_id = #{storageConfigId},</if>
+            <if test="defaultLocale != null">default_locale = #{defaultLocale},</if>
+            <if test="supportedLocales != null">supported_locales = #{supportedLocales},</if>
+            <if test="i18nMode != null">i18n_mode = #{i18nMode},</if>
+            <if test="isPersonal != null">is_personal = #{isPersonal},</if>
+            <if test="siteFunctionType != null">site_function_type = #{siteFunctionType},</if>
+            <if test="setupStatus != null">setup_status = #{setupStatus},</if>
+            <if test="templateId != null">template_id = #{templateId},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteGbSiteById" parameterType="Long">
+        update gb_sites set del_flag = '2' where id = #{id}
+    </update>
+
+    <update id="deleteGbSiteByIds" parameterType="String">
+        update gb_sites set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

@@ -1,0 +1,70 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Maven: 编译项目",
+            "type": "shell",
+            "command": ".\\mvnw.cmd",
+            "args": ["compile"],
+            "options": {
+                "env": {
+                    "JAVA_HOME": "C:/Users/Misin/.jdks/corretto-1.8.0_472"
+                }
+            },
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Maven: 打包项目",
+            "type": "shell",
+            "command": ".\\mvnw.cmd",
+            "args": ["clean", "package", "-DskipTests"],
+            "options": {
+                "env": {
+                    "JAVA_HOME": "C:/Users/Misin/.jdks/corretto-1.8.0_472"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Maven: 安装到本地仓库",
+            "type": "shell",
+            "command": ".\\mvnw.cmd",
+            "args": ["clean", "install", "-DskipTests"],
+            "options": {
+                "env": {
+                    "JAVA_HOME": "C:/Users/Misin/.jdks/corretto-1.8.0_472"
+                }
+            },
+            "group": "build",
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Spring Boot: 启动后端",
+            "type": "shell",
+            "command": ".\\mvnw.cmd",
+            "args": ["spring-boot:run", "-pl", "ruoyi-admin", "-Dfile.encoding=UTF-8"],
+            "options": {
+                "env": {
+                    "JAVA_HOME": "C:/Users/Misin/.jdks/corretto-1.8.0_472",
+                    "JAVA_TOOL_OPTIONS": "-Dfile.encoding=UTF-8"
+                }
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "pattern": {
+                    "regexp": "^$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^.*Starting.*$",
+                    "endsPattern": "^.*Started.*$"
+                }
+            }
+        }
+    ]
+}

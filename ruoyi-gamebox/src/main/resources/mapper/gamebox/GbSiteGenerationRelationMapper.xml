@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteGenerationRelationMapper">
+    
+    <!-- 检查排除关联是否存在 -->
+    <select id="checkExcludeRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_generation_relations
+        WHERE site_id = #{siteId}
+        AND generation_id = #{generationId}
+        AND relation_type = 'exclude'
+    </select>
+    
+    <!-- 插入网站关联 -->
+    <insert id="insertSiteRelation" parameterType="GbSiteRelation">
+        INSERT INTO gb_site_generation_relations (
+            site_id,
+            generation_id,
+            relation_type,
+            create_by,
+            create_time
+        ) VALUES (
+            #{siteId},
+            #{relatedId},
+            #{relationType},
+            #{createBy},
+            #{createTime}
+        )
+    </insert>
+    
+    <!-- 批量插入网站关联 -->
+    <insert id="batchInsertSiteRelations">
+        INSERT INTO gb_site_generation_relations (
+            site_id,
+            generation_id,
+            relation_type,
+            create_by,
+            create_time
+        ) VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+                #{item.siteId},
+                #{item.relatedId},
+                #{item.relationType},
+                #{item.createBy},
+                #{item.createTime}
+            )
+        </foreach>
+    </insert>
+    
+    <!-- 删除网站关联 -->
+    <delete id="deleteSiteRelation">
+        DELETE FROM gb_site_generation_relations
+        WHERE site_id = #{siteId}
+        AND generation_id = #{generationId}
+        <if test="relationType != null and relationType != ''">
+            AND relation_type = #{relationType}
+        </if>
+    </delete>
+    
+    <!-- 查询被排除的网站ID列表 -->
+    <select id="selectExcludedSiteIdsByRelationType" resultType="Long">
+        SELECT site_id
+        FROM gb_site_generation_relations
+        WHERE generation_id = #{generationId}
+        <if test="relationType != null and relationType != ''">
+            AND relation_type = #{relationType}
+        </if>
+    </select>
+    
+</mapper>

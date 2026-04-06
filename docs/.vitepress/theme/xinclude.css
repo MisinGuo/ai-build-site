@@ -1,0 +1,126 @@
+/* xinclude 插件样式 */
+
+/* 外部引用块容器 */
+.xinclude-block {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  overflow: auto;
+  font-family: var(--vp-font-family-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  background: var(--vp-c-bg-soft);
+}
+
+/* 源文件信息 */
+.xinclude-source {
+  font-size: 12px;
+  color: var(--vp-c-text-2);
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  background: var(--vp-c-default-soft);
+  border-radius: 4px;
+  border-left: 3px solid var(--vp-c-brand);
+}
+
+/* 单行容器 */
+.xline {
+  display: flex;
+  gap: 12px;
+  white-space: pre;
+  padding: 2px 0;
+}
+
+.xline:hover {
+  background: var(--vp-c-default-soft);
+}
+
+/* 行号 */
+.xline-no {
+  min-width: 4em;
+  text-align: right;
+  opacity: 0.6;
+  user-select: none;
+  text-decoration: none;
+  color: var(--vp-c-text-2);
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.xline-no:hover {
+  color: var(--vp-c-brand);
+  opacity: 1;
+}
+
+.xline-no:target {
+  color: var(--vp-c-brand);
+  opacity: 1;
+  font-weight: 700;
+}
+
+/* 行内容 */
+.xline-text {
+  flex: 1;
+  overflow-x: auto;
+  color: var(--vp-c-text-1);
+}
+
+/* 错误提示 */
+.xinclude-error {
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 8px;
+  background: var(--vp-c-danger-soft);
+  border-left: 4px solid var(--vp-c-danger);
+  color: var(--vp-c-text-1);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.xinclude-error br {
+  display: block;
+  content: "";
+  margin: 8px 0;
+}
+
+/* 暗色模式优化 */
+.dark .xinclude-block {
+  background: var(--vp-c-bg-alt);
+}
+
+.dark .xline:hover {
+  background: var(--vp-c-bg-mute);
+}
+
+.dark .xinclude-source {
+  background: var(--vp-c-bg-mute);
+}
+
+/* 高亮当前行（通过锚点） */
+.xline:has(.xline-no:target) {
+  background: var(--vp-c-brand-soft);
+  margin-left: -16px;
+  margin-right: -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* 滚动条样式 */
+.xinclude-block::-webkit-scrollbar {
+  height: 8px;
+}
+
+.xinclude-block::-webkit-scrollbar-track {
+  background: var(--vp-c-bg-alt);
+  border-radius: 4px;
+}
+
+.xinclude-block::-webkit-scrollbar-thumb {
+  background: var(--vp-c-divider);
+  border-radius: 4px;
+}
+
+.xinclude-block::-webkit-scrollbar-thumb:hover {
+  background: var(--vp-c-text-3);
+}

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteCategoryRelationMapper">
+    
+    <resultMap type="GbSiteCategoryRelation" id="GbSiteCategoryRelationResult">
+        <result property="id"    column="id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="relationType"    column="relation_type"    />
+        <result property="isVisible"    column="is_visible"    />
+        <result property="isEditable"    column="is_editable"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="remark"    column="remark"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="siteName"    column="site_name"    />
+        <result property="siteCode"    column="site_code"    />
+        <result property="siteDomain"    column="site_domain"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categorySlug"    column="category_slug"    />
+        <result property="categoryType"    column="category_type"    />
+        <result property="categoryIcon"    column="category_icon"    />
+    </resultMap>
+
+    <sql id="selectGbSiteCategoryRelationVo">
+        select id, site_id, category_id, relation_type, is_visible, is_editable, sort_order, remark, create_by, create_time, update_by, update_time from gb_site_category_relations
+    </sql>
+
+    <select id="selectGbSiteCategoryRelationList" parameterType="GbSiteCategoryRelation" resultMap="GbSiteCategoryRelationResult">
+        <include refid="selectGbSiteCategoryRelationVo"/>
+        <where>  
+            <if test="siteId != null">and site_id = #{siteId}</if>
+            <if test="categoryId != null">and category_id = #{categoryId}</if>
+            <if test="relationType != null and relationType != ''">and relation_type = #{relationType}</if>
+            <if test="isVisible != null and isVisible != ''">and is_visible = #{isVisible}</if>
+            <if test="isEditable != null and isEditable != ''">and is_editable = #{isEditable}</if>
+        </where>
+        order by sort_order, id
+    </select>
+    
+    <select id="selectGbSiteCategoryRelationById" parameterType="Long" resultMap="GbSiteCategoryRelationResult">
+        <include refid="selectGbSiteCategoryRelationVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectCategoriesBySiteId" parameterType="Long" resultMap="GbSiteCategoryRelationResult">
+        select 
+            r.id, 
+            r.site_id, 
+            r.category_id, 
+            r.is_visible,
+            r.is_editable,
+            r.sort_order, 
+            c.name as category_name,
+            c.slug as category_slug,
+            c.category_type as category_type,
+            c.icon as category_icon
+        from gb_site_category_relations r
+        inner join gb_categories c on r.category_id = c.id
+        where r.site_id = #{siteId}
+        order by r.sort_order, r.id
+    </select>
+
+    <select id="selectSitesByCategoryId" parameterType="Long" resultMap="GbSiteCategoryRelationResult">
+        select 
+            r.id, 
+            r.site_id, 
+            r.category_id, 
+            r.relation_type,
+            r.is_visible,
+            r.is_editable,
+            r.sort_order,
+            w.name as site_name,
+            w.code as site_code,
+            w.domain as site_domain
+        from gb_site_category_relations r
+        inner join gb_sites w on r.site_id = w.id
+        where r.category_id = #{categoryId}
+        order by r.sort_order, r.id
+    </select>
+
+    <select id="checkRelationExists" resultType="int">
+        select count(*) from gb_site_category_relations
+        where site_id = #{siteId} and category_id = #{categoryId}
+          and (relation_type IS NULL OR relation_type = 'include')
+    </select>
+    
+    <select id="checkExcludeRelationExists" resultType="int">
+        select count(*) from gb_site_category_relations
+        where site_id = #{siteId} and category_id = #{categoryId} and relation_type = 'exclude'
+    </select>
+
+    <!-- 查询所有全局分类的关联配置（全局分类 = 个人站 is_personal=1 的分类） -->
+    <select id="selectGlobalCategoryRelations" resultMap="GbSiteCategoryRelationResult">
+        SELECT r.*, c.name as category_name, c.category_type, s.name as site_name
+        FROM gb_site_category_relations r
+        INNER JOIN gb_categories c ON r.category_id = c.id
+        INNER JOIN gb_sites ps ON c.site_id = ps.id AND ps.is_personal = 1
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        WHERE c.del_flag = '0'
+          AND c.status = '1'
+        ORDER BY r.site_id, r.sort_order
+    </select>
+
+    <insert id="insertGbSiteCategoryRelation" parameterType="GbSiteCategoryRelation" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_site_category_relations (
+            site_id,
+            category_id,
+            relation_type,
+            <if test="isVisible != null">is_visible,</if>
+            <if test="isEditable != null">is_editable,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="remark != null">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time</if>
+        ) values (
+            #{siteId},
+            #{categoryId},
+            <choose>
+                <when test="relationType != null">#{relationType}</when>
+                <otherwise>'include'</otherwise>
+            </choose>,
+            <if test="isVisible != null">#{isVisible},</if>
+            <if test="isEditable != null">#{isEditable},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime}</if>
+        )
+    </insert>
+
+    <insert id="batchInsertGbSiteCategoryRelation">
+        insert into gb_site_category_relations(site_id, category_id, is_visible, is_editable, sort_order, relation_type, create_by, create_time)
+        values
+        <foreach collection="relations" item="item" separator=",">
+            (#{item.siteId}, #{item.categoryId}, #{item.isVisible}, #{item.isEditable}, #{item.sortOrder}, #{item.relationType}, #{item.createBy}, #{item.createTime})
+        </foreach>
+        ON DUPLICATE KEY UPDATE 
+            relation_type = VALUES(relation_type),
+            is_visible = VALUES(is_visible),
+            update_time = NOW()
+    </insert>
+
+    <update id="updateGbSiteCategoryRelation" parameterType="GbSiteCategoryRelation">
+        update gb_site_category_relations
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="isVisible != null">is_visible = #{isVisible},</if>
+            <if test="isEditable != null">is_editable = #{isEditable},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateVisibility" parameterType="GbSiteCategoryRelation">
+        update gb_site_category_relations
+        set is_visible = #{isVisible}
+        where site_id = #{siteId} and category_id = #{categoryId}
+    </update>
+
+    <delete id="deleteGbSiteCategoryRelationById" parameterType="Long">
+        delete from gb_site_category_relations where id = #{id}
+    </delete>
+
+    <delete id="deleteGbSiteCategoryRelationsBySiteId">
+        delete from gb_site_category_relations where site_id = #{siteId}
+    </delete>
+
+    <delete id="deleteGbSiteCategoryRelationsByCategoryId">
+        delete from gb_site_category_relations where category_id = #{categoryId}
+    </delete>
+
+    <delete id="deleteGbSiteCategoryRelation">
+        delete from gb_site_category_relations 
+        where site_id = #{siteId} and category_id = #{categoryId}
+        <if test="relationType != null and relationType != ''">
+            and relation_type = #{relationType}
+        </if>
+    </delete>
+
+    <delete id="deleteGbSiteCategoryRelationByIds" parameterType="String">
+        delete from gb_site_category_relations where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+    <!-- 批量查询已存在的关联 -->
+    <select id="selectExistingRelations" resultType="Long">
+        select category_id from gb_site_category_relations
+        where site_id = #{siteId}
+        and category_id in
+        <foreach item="id" collection="categoryIds" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    <!-- 批量删除：对给定 categoryIds + relationType，删除不在 keepSiteIds 中的网站关联 -->
+    <delete id="deleteByCategoryIdsAndTypeExcluding">
+        DELETE FROM gb_site_category_relations
+        WHERE category_id IN
+        <foreach collection="categoryIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND relation_type = #{relationType}
+        <if test="keepSiteIds != null and keepSiteIds.size() &gt; 0">
+        AND site_id NOT IN
+        <foreach collection="keepSiteIds" item="sid" open="(" separator="," close=")">
+            #{sid}
+        </foreach>
+        </if>
+    </delete>
+
+</mapper>

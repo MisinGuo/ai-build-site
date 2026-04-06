@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.gamebox.mapper.GbWorkflowStepExecutionMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.gamebox.domain.GbWorkflowStepExecution">
+        <id     column="id"           property="id" />
+        <result column="execution_id" property="executionId" />
+        <result column="step_id"      property="stepId" />
+        <result column="step_name"    property="stepName" />
+        <result column="step_type"    property="stepType" />
+        <result column="tool_code"    property="toolCode" />
+        <result column="status"       property="status" />
+        <result column="input_data"   property="inputData" />
+        <result column="output_data"  property="outputData" />
+        <result column="step_config"  property="stepConfig" />
+        <result column="error"        property="error" />
+        <result column="start_time"   property="startTime" />
+        <result column="end_time"     property="endTime" />
+        <result column="duration"     property="duration" />
+        <result column="create_time"  property="createTime" />
+    </resultMap>
+
+    <!-- 插入步骤执行记录 -->
+    <insert id="insertStepExecution" parameterType="com.ruoyi.gamebox.domain.GbWorkflowStepExecution"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gb_workflow_step_execution
+            (execution_id, step_id, step_name, step_type, tool_code, status,
+             input_data, step_config, start_time, create_time)
+        VALUES
+            (#{executionId}, #{stepId}, #{stepName}, #{stepType}, #{toolCode}, #{status},
+             #{inputData}, #{stepConfig}, #{startTime}, NOW())
+    </insert>
+
+    <!-- 更新步骤执行记录（执行结束后回填） -->
+    <update id="updateStepExecution" parameterType="com.ruoyi.gamebox.domain.GbWorkflowStepExecution">
+        UPDATE gb_workflow_step_execution
+        <set>
+            <if test="status != null">status = #{status},</if>
+            <if test="outputData != null">output_data = #{outputData},</if>
+            <if test="error != null">error = #{error},</if>
+            <if test="endTime != null">end_time = #{endTime},</if>
+            <if test="duration != null">duration = #{duration},</if>
+        </set>
+        WHERE execution_id = #{executionId} AND step_id = #{stepId}
+    </update>
+
+    <!-- 查询某次执行的所有步骤记录 -->
+    <select id="selectByExecutionId" resultMap="BaseResultMap">
+        SELECT * FROM gb_workflow_step_execution
+        WHERE execution_id = #{executionId}
+        ORDER BY start_time ASC, id ASC
+    </select>
+
+    <!-- 删除某次执行的所有步骤记录 -->
+    <delete id="deleteByExecutionId">
+        DELETE FROM gb_workflow_step_execution WHERE execution_id = #{executionId}
+    </delete>
+
+</mapper>

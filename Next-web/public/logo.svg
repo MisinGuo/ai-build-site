@@ -1,0 +1,36 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradMain" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6C3FE8"></stop>
+      <stop offset="100%" stop-color="#5A32C7"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- 主体：手柄+宝箱 -->
+  <rect x="96" y="160" rx="80" ry="80" width="320" height="200" fill="url(#gradMain)"></rect>
+
+  <!-- 宝箱上盖 -->
+  <path d="M96 160 Q256 60 416 160" fill="#FF6B35"></path>
+
+  <!-- 中间锁扣 -->
+  <rect x="236" y="200" width="40" height="40" rx="10" fill="#FF6B35"></rect>
+
+  <!-- 左方向键 -->
+  <rect x="150" y="230" width="20" height="60" rx="6" fill="#FFFFFF"></rect>
+  <rect x="130" y="250" width="60" height="20" rx="6" fill="#FFFFFF"></rect>
+
+  <!-- 右按钮 -->
+  <circle cx="350" cy="250" r="12" fill="#FFFFFF"></circle>
+  <circle cx="380" cy="230" r="12" fill="#FFFFFF"></circle>
+  <circle cx="380" cy="270" r="12" fill="#FFFFFF"></circle>
+  <circle cx="410" cy="250" r="12" fill="#FFFFFF"></circle>
+
+  <!-- 手柄握把（左） -->
+  <path d="M96 260 Q60 320 120 380 Q160 360 150 300 Z" fill="#6C3FE8"></path>
+
+  <!-- 手柄握把（右） -->
+  <path d="M416 260 Q452 320 392 380 Q352 360 362 300 Z" fill="#6C3FE8"></path>
+
+  <!-- 高光 -->
+  <ellipse cx="200" cy="180" rx="60" ry="20" fill="#FFFFFF" opacity="0.15"></ellipse>
+</svg>

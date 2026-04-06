@@ -1,0 +1,82 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: aisite-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aisite}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-AiSite2025!}
+      POSTGRES_DB: aisite
+      TZ: Asia/Shanghai
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "25432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aisite}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: aisite-redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-Redis2025!}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "26379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  elasticsearch:
+    image: elasticsearch:7.17.25
+    container_name: aisite-es
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - TZ=Asia/Shanghai
+      - "cluster.routing.allocation.disk.watermark.low=95%"
+      - "cluster.routing.allocation.disk.watermark.high=97%"
+      - "cluster.routing.allocation.disk.watermark.flood_stage=99%"
+      - http_proxy=http://misin:misin@local.zeusai.top:10666
+      - https_proxy=http://misin:misin@local.zeusai.top:10666
+      - HTTP_PROXY=http://misin:misin@local.zeusai.top:10666
+      - HTTPS_PROXY=http://misin:misin@local.zeusai.top:10666
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+      - es_plugins:/usr/share/elasticsearch/plugins
+    ports:
+      - "29200:9200"
+      - "29300:9300"
+    entrypoint: /bin/bash
+    command: >
+      -c "
+      if [ ! -f /usr/share/elasticsearch/plugins/analysis-ik/plugin-descriptor.properties ]; then
+        echo '正在安装 IK 分词器插件...';
+        elasticsearch-plugin install --batch https://get.infini.cloud/elasticsearch/analysis-ik/7.17.25;
+        echo 'IK 分词器安装完成';
+      fi;
+      /usr/local/bin/docker-entrypoint.sh eswrapper
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
+  es_data:
+  es_plugins:
+
+networks:
+  default:
+    name: aisite-network

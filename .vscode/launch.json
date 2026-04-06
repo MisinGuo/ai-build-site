@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "启动若依后端",
+            "request": "launch",
+            "mainClass": "com.ruoyi.RuoYiApplication",
+            "projectName": "ruoyi-admin",
+            "vmArgs": "-Dfile.encoding=UTF-8 -Xms256m -Xmx1024m",
+            "console": "integratedTerminal",
+            "shortenCommandLine": "auto"
+        },
+        {
+            "type": "java",
+            "name": "Debug 若依后端",
+            "request": "launch",
+            "mainClass": "com.ruoyi.RuoYiApplication",
+            "projectName": "ruoyi-admin",
+            "vmArgs": "-Dfile.encoding=UTF-8 -Xms256m -Xmx1024m",
+            "console": "integratedTerminal",
+            "shortenCommandLine": "auto"
+        }
+    ]
+}

@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbMasterArticleMapper">
+    
+    <resultMap type="GbMasterArticle" id="GbMasterArticleResult">
+        <result property="id"    column="id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="siteName"    column="site_name"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categoryIcon"    column="category_icon"    />
+        <result property="sectionId"    column="section_id"    />
+        <result property="sectionName"    column="section_name"    />
+        <result property="isAiGenerated"    column="is_ai_generated"    />
+        <result property="promptTemplateId"    column="prompt_template_id"    />
+        <result property="generationCount"    column="generation_count"    />
+        <result property="lastGenerationId"    column="last_generation_id"    />
+        <result property="isTop"    column="is_top"    />
+        <result property="isRecommend"    column="is_recommend"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="publishTime"    column="publish_time"    />
+        <result property="remark"    column="remark"    />
+        <!-- 以下字段来自默认语言版本的文章 -->
+        <result property="title"    column="article_title"    />
+        <result property="coverUrl"    column="article_cover_url"    />
+        <result property="author"    column="article_author"    />
+        <result property="slug"    column="article_slug"    />
+        <result property="storageConfigId"    column="article_storage_config_id"    />
+        <result property="storageUrl"    column="article_storage_url"    />
+        <result property="viewCount"    column="article_view_count"    />
+        <result property="locale"    column="article_locale"    />
+        <!-- 关联查询模式的额外字段 -->
+        <result property="siteName"    column="site_name"    />
+        <result property="categoryName"    column="category_name"    />
+        <result property="categoryIcon"    column="category_icon"    />
+        <result property="sectionId"    column="section_id"    />
+        <result property="sectionName"    column="section_name"    />
+        <result property="isVisible"    column="is_visible"    />
+        <result property="relationSource"    column="relation_source"    />
+        <result property="isExcluded"    column="is_excluded"    />
+        <result property="relatedSitesCount"    column="related_sites_count"    />
+        <result property="excludedSitesCount"    column="excluded_sites_count"    />
+    </resultMap>
+
+    <resultMap type="GbMasterArticle" id="GbMasterArticleWithAssociationsResult" extends="GbMasterArticleResult">
+        <collection property="gameBoxAssociations" ofType="GbMasterArticleGameBox" column="id" select="com.ruoyi.gamebox.mapper.GbMasterArticleGameBoxMapper.selectGbMasterArticleGameBoxByMasterArticleId"/>
+        <collection property="gameAssociations" ofType="GbMasterArticleGame" column="id" select="com.ruoyi.gamebox.mapper.GbMasterArticleGameMapper.selectGbMasterArticleGameByMasterArticleId"/>
+        <collection property="dramaAssociations" ofType="GbMasterArticleDrama" column="id" select="com.ruoyi.gamebox.mapper.GbMasterArticleDramaMapper.selectGbMasterArticleDramaByMasterArticleId"/>
+    </resultMap>
+
+    <sql id="selectGbMasterArticleVo">
+        select id, site_id, category_id, is_ai_generated, 
+               prompt_template_id, generation_count, last_generation_id, is_top, 
+               is_recommend, sort_order, del_flag, create_by, create_time, update_by, 
+               update_time, publish_time, remark 
+        from gb_master_articles
+    </sql>
+
+    <sql id="selectGbMasterArticleWithCategoryVo">
+        select m.id, m.site_id, s.name as site_name, m.category_id, 
+               c.name as category_name, c.icon as category_icon, 
+               CASE WHEN c.is_section = '1' THEN c.id ELSE c.parent_id END as section_id,
+               CASE WHEN c.is_section = '1' THEN c.name ELSE pc.name END as section_name,
+               m.is_ai_generated, m.prompt_template_id, m.generation_count, m.last_generation_id, 
+               m.is_top, m.is_recommend, m.sort_order, m.del_flag, 
+               m.create_by, m.create_time, m.update_by, m.update_time, m.publish_time, m.remark,
+               a.title as article_title, a.cover_url as article_cover_url, a.author as article_author,
+               a.slug as article_slug, a.storage_config_id as article_storage_config_id, 
+               a.storage_url as article_storage_url, a.view_count as article_view_count,
+               a.locale as article_locale,
+               -- 关联的网站数量（仅对非个人站点配置计算，排除自己所属网站）
+               CASE 
+                   WHEN s.is_personal = 1 THEN NULL
+                   ELSE (SELECT COUNT(*) FROM gb_site_master_article_relations r WHERE r.master_article_id = m.id AND r.relation_type = 'include' AND r.site_id != m.site_id)
+               END as related_sites_count,
+               -- 排除的网站数量
+               (SELECT COUNT(*) FROM gb_site_master_article_relations r WHERE r.master_article_id = m.id AND r.relation_type = 'exclude') as excluded_sites_count
+        from gb_master_articles m 
+        left join gb_categories c on m.category_id = c.id and c.del_flag = '0'
+        left join gb_categories pc on c.parent_id = pc.id and pc.del_flag = '0' and pc.is_section = '1'
+        left join gb_sites s on m.site_id = s.id
+        left join gb_articles a on a.master_article_id = m.id 
+            and a.locale = COALESCE(s.default_locale, 'zh-CN')
+            and a.del_flag = '0'
+    </sql>
+
+    <select id="selectGbMasterArticleList" parameterType="GbMasterArticle" resultMap="GbMasterArticleResult">
+        <!-- 关联模式：查询网站可见的主文章（三源：自有+默认+共享） -->
+        <if test="queryMode != null and queryMode == 'related' and siteId != null">
+            select m.id, m.site_id, s.name as site_name, m.category_id, 
+                   c.name as category_name, c.icon as category_icon, 
+                   CASE WHEN c.is_section = '1' THEN c.id ELSE c.parent_id END as section_id,
+                   CASE WHEN c.is_section = '1' THEN c.name ELSE pc.name END as section_name,
+                   m.is_ai_generated, m.prompt_template_id, m.generation_count, m.last_generation_id, 
+                   m.is_top, m.is_recommend, m.sort_order, m.del_flag, 
+                   m.create_by, m.create_time, m.update_by, m.update_time, m.publish_time, m.remark,
+                   a.title as article_title, a.cover_url as article_cover_url, a.author as article_author,
+                   a.slug as article_slug, a.storage_config_id as article_storage_config_id, 
+                   a.storage_url as article_storage_url, a.view_count as article_view_count,
+                   a.locale as article_locale,
+                   -- 统一的可见性状态（基于文章状态）
+                   -- 1. 自有文章（site_id = 当前网站）：始终可见
+                   -- 2. 默认配置（site_id = 0）：
+                   --    - 如果有关联记录（incl.id不为空），使用关联表的is_visible（忽略排除逻辑）
+                   --    - 如果没有关联记录，使用排除逻辑（有excl记录则不可见，否则可见）
+                   -- 3. 其他网站文章：使用关联表的is_visible（必须有关联记录才能访问）
+                   CASE 
+                       WHEN m.site_id = #{siteId} THEN '1'
+                       WHEN m.site_id = #{params.personalSiteId} THEN 
+                           (CASE 
+                               WHEN incl.id IS NOT NULL THEN incl.is_visible
+                               WHEN excl.id IS NULL THEN '1' 
+                               ELSE '0' 
+                           END)
+                       ELSE IFNULL(incl.is_visible, '0')
+                   END as is_visible,
+                   -- 关联来源标识
+                   CASE 
+                       WHEN m.site_id = #{siteId} THEN 'own'
+                       WHEN m.site_id = #{params.personalSiteId} THEN 'default'
+                       ELSE 'shared'
+                   END as relation_source,
+                   -- 是否被排除（仅对默认配置且无关联记录时有效）
+                   CASE WHEN m.site_id = #{params.personalSiteId} AND incl.id IS NULL AND excl.id IS NOT NULL THEN '1' ELSE '0' END as is_excluded,
+                   -- 关联的网站数量（仅对非默认配置计算，排除自己所属网站）
+                   CASE 
+                       WHEN m.site_id = #{params.personalSiteId} THEN NULL
+                       ELSE (SELECT COUNT(*) FROM gb_site_master_article_relations r WHERE r.master_article_id = m.id AND r.relation_type = 'include' AND r.site_id != m.site_id)
+                   END as related_sites_count,
+                   -- 排除的网站数量
+                   (SELECT COUNT(*) FROM gb_site_master_article_relations r WHERE r.master_article_id = m.id AND r.relation_type = 'exclude') as excluded_sites_count
+            from gb_master_articles m 
+            left join gb_categories c on m.category_id = c.id and c.del_flag = '0'
+            left join gb_categories pc on c.parent_id = pc.id and pc.del_flag = '0' and pc.is_section = '1'
+            left join gb_sites s on m.site_id = s.id
+            left join gb_articles a on a.master_article_id = m.id 
+                and a.locale = COALESCE(s.default_locale, 'zh-CN')
+                and a.del_flag = '0'
+            -- 左连接正向关联（include）
+            LEFT JOIN gb_site_master_article_relations incl 
+                ON m.id = incl.master_article_id 
+                AND incl.site_id = #{siteId} 
+                AND incl.relation_type = 'include'
+            -- 左连接排除关联（exclude）
+            LEFT JOIN gb_site_master_article_relations excl 
+                ON m.id = excl.master_article_id 
+                AND excl.site_id = #{siteId} 
+                AND excl.relation_type = 'exclude'
+            <where>
+                m.del_flag = '0'
+                <!-- 三种文章来源：own(自有) | default(默认配置) | shared(跨站共享) -->
+                AND (
+                    m.site_id = #{siteId}
+                    <if test="params != null and params.personalSiteId != null">
+                        OR m.site_id = #{params.personalSiteId}
+                    </if>
+                    OR (m.site_id != #{siteId}
+                        <if test="params != null and params.personalSiteId != null">
+                            AND m.site_id != #{params.personalSiteId}
+                        </if>
+                        AND incl.id IS NOT NULL)
+                )
+                <if test="categoryId != null"> and m.category_id = #{categoryId}</if>
+                <if test="sectionId != null"> and (c.parent_id = #{sectionId} or (c.is_section = '1' and c.id = #{sectionId}))</if>
+                <if test="title != null and title != ''"> and a.title like concat('%', #{title}, '%')</if>
+                <if test="isAiGenerated != null and isAiGenerated != ''"> and m.is_ai_generated = #{isAiGenerated}</if>
+                <if test="isTop != null and isTop != ''"> and m.is_top = #{isTop}</if>
+                <if test="isRecommend != null and isRecommend != ''"> and m.is_recommend = #{isRecommend}</if>
+                <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                    and date_format(m.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+                </if>
+                <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                    and date_format(m.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+                </if>
+            </where>
+            order by m.is_top desc, m.sort_order asc, m.create_time desc
+        </if>
+        <!-- 创建者模式：查询指定创建者的主文章（默认模式） -->
+        <if test="queryMode == null or queryMode == 'creator'">
+            <include refid="selectGbMasterArticleWithCategoryVo"/>
+            <where>  
+                m.del_flag = '0'
+                <choose>
+                    <!-- 包含默认配置：查询指定网站创建的 + 默认配置 -->
+                    <when test="siteId != null and includeDefault != null and includeDefault == true and siteId &gt; 0">
+                        AND (m.site_id = #{siteId}<if test="params != null and params.personalSiteId != null"> OR m.site_id = #{params.personalSiteId}</if>)
+                    </when>
+                    <!-- 明确指定网站ID -->
+                    <when test="siteId != null and siteId &gt; 0">
+                        AND m.site_id = #{siteId}
+                    </when>
+                    <!-- siteId为null时，用personalSiteId兜底，否则返回空 -->
+                    <when test="params != null and params.personalSiteId != null">
+                        AND m.site_id = #{params.personalSiteId}
+                    </when>
+                    <otherwise>
+                        AND 1 = 0
+                    </otherwise>
+                </choose>
+                <if test="categoryId != null"> and m.category_id = #{categoryId}</if>
+                <if test="sectionId != null"> and (c.parent_id = #{sectionId} or (c.is_section = '1' and c.id = #{sectionId}))</if>
+                <if test="title != null and title != ''"> and a.title like concat('%', #{title}, '%')</if>
+                <if test="isAiGenerated != null and isAiGenerated != ''"> and m.is_ai_generated = #{isAiGenerated}</if>
+                <if test="isTop != null and isTop != ''"> and m.is_top = #{isTop}</if>
+                <if test="isRecommend != null and isRecommend != ''"> and m.is_recommend = #{isRecommend}</if>
+                <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                    and date_format(m.create_time,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+                </if>
+                <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                    and date_format(m.create_time,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+                </if>
+            </where>
+            order by m.is_top desc, m.sort_order asc, m.create_time desc
+        </if>
+    </select>
+    
+    <select id="selectGbMasterArticleById" parameterType="Long" resultMap="GbMasterArticleResult">
+        <include refid="selectGbMasterArticleWithCategoryVo"/>
+        where m.id = #{id} and m.del_flag = '0'
+    </select>
+
+    <!-- 注释：content_key字段已从表中移除
+    <select id="selectGbMasterArticleByContentKey" parameterType="String" resultMap="GbMasterArticleResult">
+        <include refid="selectGbMasterArticleVo"/>
+        where content_key = #{contentKey} and del_flag = '0'
+        limit 1
+    </select>
+    -->
+
+    <select id="selectGbMasterArticleWithAssociations" parameterType="Long" resultMap="GbMasterArticleWithAssociationsResult">
+        <include refid="selectGbMasterArticleWithCategoryVo"/>
+        where m.id = #{id} and m.del_flag = '0'
+    </select>
+
+    <select id="selectLanguageVersionCount" parameterType="Long" resultType="Integer">
+        select count(*) from gb_articles 
+        where master_content_id = #{masterArticleId} and del_flag = '0'
+    </select>
+
+    <!-- 注释：content_key字段已从表中移除
+    <select id="checkContentKeyExists" resultType="Boolean">
+        select count(1) from gb_master_articles 
+        where content_key = #{contentKey} and del_flag = '0'
+        <if test="excludeId != null">
+            and id != #{excludeId}
+        </if>
+        limit 1
+    </select>
+    -->
+        
+    <insert id="insertGbMasterArticle" parameterType="GbMasterArticle" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_master_articles
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">site_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="isAiGenerated != null">is_ai_generated,</if>
+            <if test="promptTemplateId != null">prompt_template_id,</if>
+            <if test="generationCount != null">generation_count,</if>
+            <if test="lastGenerationId != null">last_generation_id,</if>
+            <if test="isTop != null">is_top,</if>
+            <if test="isRecommend != null">is_recommend,</if>
+            <if test="sortOrder != null">sort_order,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="publishTime != null">publish_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">#{siteId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="isAiGenerated != null">#{isAiGenerated},</if>
+            <if test="promptTemplateId != null">#{promptTemplateId},</if>
+            <if test="generationCount != null">#{generationCount},</if>
+            <if test="lastGenerationId != null">#{lastGenerationId},</if>
+            <if test="isTop != null">#{isTop},</if>
+            <if test="isRecommend != null">#{isRecommend},</if>
+            <if test="sortOrder != null">#{sortOrder},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="publishTime != null">#{publishTime},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updateGbMasterArticle" parameterType="GbMasterArticle">
+        update gb_master_articles
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="isAiGenerated != null">is_ai_generated = #{isAiGenerated},</if>
+            <if test="promptTemplateId != null">prompt_template_id = #{promptTemplateId},</if>
+            <if test="generationCount != null">generation_count = #{generationCount},</if>
+            <if test="lastGenerationId != null">last_generation_id = #{lastGenerationId},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGbMasterArticleById" parameterType="Long">
+        update gb_master_articles set del_flag = '2' where id = #{id}
+    </delete>
+
+    <delete id="deleteGbMasterArticleByIds" parameterType="String">
+        update gb_master_articles set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

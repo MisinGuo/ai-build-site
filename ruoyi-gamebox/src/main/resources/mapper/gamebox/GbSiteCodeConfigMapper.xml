@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteCodeConfigMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.gamebox.domain.GbSiteCodeConfig">
+        <id     property="id"                     column="id"                      />
+        <result property="siteId"                 column="site_id"                 />
+        <result property="gitProvider"            column="git_provider"            />
+        <result property="gitRepoUrl"             column="git_repo_url"            />
+        <result property="gitBranch"              column="git_branch"              />
+        <result property="gitAutoSync"            column="git_auto_sync"           />
+        <result property="gitAccountId"           column="git_account_id"          />
+        <result property="cfAccountId"            column="cf_account_id"           />
+        <result property="deployPlatform"         column="deploy_platform"         />
+        <result property="cloudflareProjectName"  column="cloudflare_project_name" />
+        <result property="cloudflareProjectId"    column="cloudflare_project_id"   />
+        <result property="customDomains"          column="custom_domains"          />
+        <result property="deployStatus"           column="deploy_status"           />
+        <result property="deployUrl"              column="deploy_url"              />
+        <result property="lastDeployTime"         column="last_deploy_time"        />
+        <result property="lastDeployLog"          column="last_deploy_log"         />
+        <result property="deployConfig"           column="deploy_config"           />
+        <result property="createTime"             column="create_time"             />
+        <result property="updateTime"             column="update_time"             />
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, site_id, git_provider, git_repo_url, git_branch, git_auto_sync,
+        git_account_id, cf_account_id, deploy_platform,
+        cloudflare_project_name, cloudflare_project_id, custom_domains,
+        deploy_status, deploy_url, last_deploy_time, last_deploy_log, deploy_config,
+        create_time, update_time
+    </sql>
+
+    <!-- 按 site_id 查询 -->
+    <select id="selectBySiteId" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM gb_site_code_config
+        WHERE site_id = #{siteId}
+        LIMIT 1
+    </select>
+
+    <!-- 插入 -->
+    <insert id="insert" parameterType="com.ruoyi.gamebox.domain.GbSiteCodeConfig"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gb_site_code_config (
+            site_id, git_provider, git_repo_url, git_branch, git_auto_sync,
+            git_account_id, cf_account_id, deploy_platform,
+            cloudflare_project_name, cloudflare_project_id, custom_domains,
+            deploy_status, deploy_url, last_deploy_time, last_deploy_log, deploy_config
+        ) VALUES (
+            #{siteId}, #{gitProvider}, #{gitRepoUrl},
+            <choose>
+                <when test="gitBranch != null and gitBranch != ''">#{gitBranch}</when>
+                <otherwise>'main'</otherwise>
+            </choose>,
+            #{gitAutoSync},
+            #{gitAccountId}, #{cfAccountId}, #{deployPlatform},
+            #{cloudflareProjectName}, #{cloudflareProjectId}, #{customDomains},
+            <choose>
+                <when test="deployStatus != null">#{deployStatus}</when>
+                <otherwise>'not_deployed'</otherwise>
+            </choose>,
+            #{deployUrl}, #{lastDeployTime}, #{lastDeployLog}, #{deployConfig}
+        )
+    </insert>
+
+    <!-- 按 site_id 更新（null 字段不覆盖） -->
+    <update id="updateBySiteId" parameterType="com.ruoyi.gamebox.domain.GbSiteCodeConfig">
+        UPDATE gb_site_code_config
+        <set>
+            <if test="gitProvider != null">git_provider = #{gitProvider},</if>
+            <if test="gitRepoUrl != null">git_repo_url = #{gitRepoUrl},</if>
+            <if test="gitBranch != null and gitBranch != ''">git_branch = #{gitBranch},</if>
+            <if test="gitAutoSync != null">git_auto_sync = #{gitAutoSync},</if>
+            <if test="gitAccountId != null">git_account_id = #{gitAccountId},</if>
+            <if test="cfAccountId != null">cf_account_id = #{cfAccountId},</if>
+            <if test="deployPlatform != null">deploy_platform = #{deployPlatform},</if>
+            <if test="cloudflareProjectName != null">cloudflare_project_name = #{cloudflareProjectName},</if>
+            <if test="cloudflareProjectId != null">cloudflare_project_id = #{cloudflareProjectId},</if>
+            <if test="customDomains != null">custom_domains = #{customDomains},</if>
+            <if test="deployStatus != null">deploy_status = #{deployStatus},</if>
+            <if test="deployUrl != null">deploy_url = #{deployUrl},</if>
+            <if test="lastDeployTime != null">last_deploy_time = #{lastDeployTime},</if>
+            <if test="lastDeployLog != null">last_deploy_log = #{lastDeployLog},</if>
+            <if test="deployConfig != null">deploy_config = #{deployConfig},</if>
+            update_time = NOW()
+        </set>
+        WHERE site_id = #{siteId}
+    </update>
+
+    <!-- Upsert: 存在则更新，不存在则插入 -->
+    <insert id="upsert" parameterType="com.ruoyi.gamebox.domain.GbSiteCodeConfig">
+        INSERT INTO gb_site_code_config (
+            site_id, git_provider, git_repo_url, git_branch, git_auto_sync,
+            git_account_id, cf_account_id, deploy_platform,
+            cloudflare_project_name, cloudflare_project_id, custom_domains,
+            deploy_status, deploy_url, last_deploy_time, last_deploy_log, deploy_config
+        ) VALUES (
+            #{siteId},
+            #{gitProvider}, #{gitRepoUrl},
+            <choose>
+                <when test="gitBranch != null and gitBranch != ''">#{gitBranch}</when>
+                <otherwise>'main'</otherwise>
+            </choose>,
+            <choose><when test="gitAutoSync != null">#{gitAutoSync}</when><otherwise>'0'</otherwise></choose>,
+            #{gitAccountId}, #{cfAccountId}, #{deployPlatform},
+            #{cloudflareProjectName}, #{cloudflareProjectId}, #{customDomains},
+            <choose>
+                <when test="deployStatus != null">#{deployStatus}</when>
+                <otherwise>'not_deployed'</otherwise>
+            </choose>,
+            #{deployUrl}, #{lastDeployTime}, #{lastDeployLog}, #{deployConfig}
+        )
+        ON DUPLICATE KEY UPDATE
+            <if test="gitProvider != null">git_provider = VALUES(git_provider),</if>
+            <if test="gitRepoUrl != null">git_repo_url = VALUES(git_repo_url),</if>
+            <if test="gitBranch != null and gitBranch != ''">git_branch = VALUES(git_branch),</if>
+            <if test="gitAutoSync != null">git_auto_sync = VALUES(git_auto_sync),</if>
+            <if test="gitAccountId != null">git_account_id = VALUES(git_account_id),</if>
+            <if test="cfAccountId != null">cf_account_id = VALUES(cf_account_id),</if>
+            <if test="deployPlatform != null">deploy_platform = VALUES(deploy_platform),</if>
+            <if test="cloudflareProjectName != null">cloudflare_project_name = VALUES(cloudflare_project_name),</if>
+            <if test="cloudflareProjectId != null">cloudflare_project_id = VALUES(cloudflare_project_id),</if>
+            <if test="customDomains != null">custom_domains = VALUES(custom_domains),</if>
+            <if test="deployStatus != null">deploy_status = VALUES(deploy_status),</if>
+            <if test="deployUrl != null">deploy_url = VALUES(deploy_url),</if>
+            <if test="lastDeployTime != null">last_deploy_time = VALUES(last_deploy_time),</if>
+            <if test="lastDeployLog != null">last_deploy_log = VALUES(last_deploy_log),</if>
+            <if test="deployConfig != null">deploy_config = VALUES(deploy_config),</if>
+            update_time = NOW()
+    </insert>
+
+
+    <!-- 仅更新部署状态相关字段 -->
+    <update id="updateDeployStatus">
+        UPDATE gb_site_code_config
+        SET
+            deploy_status    = #{deployStatus},
+            deploy_url       = #{deployUrl},
+            last_deploy_time = #{lastDeployTime},
+            last_deploy_log  = #{lastDeployLog},
+            update_time      = NOW()
+        WHERE site_id = #{siteId}
+    </update>
+
+    <!-- 按 site_id 删除 -->
+    <delete id="deleteBySiteId">
+        DELETE FROM gb_site_code_config WHERE site_id = #{siteId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,25 @@
+{
+  "name": "aisite-docs",
+  "version": "1.0.0",
+  "description": "AI 建站运营平台技术文档",
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "@braintree/sanitize-url": "^7.1.1",
+    "@types/markdown-it": "^14.1.2",
+    "cytoscape": "^3.33.1",
+    "cytoscape-cose-bilkent": "^4.1.0",
+    "dayjs": "^1.11.19",
+    "debug": "^4.4.3",
+    "mermaid": "^10.0.0",
+    "vitepress": "^1.0.0",
+    "vue": "^3.4.0"
+  },
+  "dependencies": {
+    "vue": "^3.5.25"
+  }
+}

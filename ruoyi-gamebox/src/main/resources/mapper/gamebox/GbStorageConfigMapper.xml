@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbStorageConfigMapper">
+    
+    <resultMap type="GbStorageConfig" id="GbStorageConfigResult">
+        <result property="id"           column="id"            />
+        <result property="siteId"       column="site_id"       />
+        <result property="name"         column="name"          />
+        <result property="code"         column="code"          />
+        <result property="storageType"  column="storage_type"  />
+        <result property="storagePurpose" column="storage_purpose" />
+        <result property="githubToken"  column="github_token"  />
+        <result property="githubOwner"  column="github_owner"  />
+        <result property="githubRepo"   column="github_repo"   />
+        <result property="githubBranch" column="github_branch" />
+        <result property="githubPathPrefix" column="github_path_prefix" />
+        <result property="r2AccountId"  column="r2_account_id" />
+        <result property="r2AccessKey"  column="r2_access_key" />
+        <result property="r2SecretKey"  column="r2_secret_key" />
+        <result property="r2Bucket"     column="r2_bucket"     />
+        <result property="r2PublicUrl"  column="r2_public_url" />
+        <result property="ossEndpoint"  column="oss_endpoint"  />
+        <result property="ossAccessKey" column="oss_access_key" />
+        <result property="ossSecretKey" column="oss_secret_key" />
+        <result property="ossBucket"    column="oss_bucket"    />
+        <result property="ossRegion"    column="oss_region"    />
+        <result property="basePath"     column="base_path"     />
+        <result property="customDomain" column="custom_domain" />
+        <result property="maxFileSize"  column="max_file_size" />
+        <result property="allowedExtensions" column="allowed_extensions" />
+        <result property="isDefault"    column="is_default"    />
+        <result property="priority"     column="priority"      />
+        <result property="status"       column="status"        />
+        <result property="delFlag"      column="del_flag"      />
+        <result property="categoryId"   column="category_id"   />
+        <result property="categoryName" column="category_name" />
+        <result property="categoryIcon" column="category_icon" />
+        <result property="relatedSitesCount" column="related_sites_count" />
+        <result property="excludedSitesCount" column="excluded_sites_count" />
+        <result property="isVisible"    column="is_visible"    />
+        <result property="isExcluded"   column="is_excluded"   />
+        <result property="relationSource" column="relation_source" />
+        <result property="createBy"     column="create_by"     />
+        <result property="createTime"   column="create_time"   />
+        <result property="updateBy"     column="update_by"     />
+        <result property="updateTime"   column="update_time"   />
+        <result property="description"  column="description"   />
+    </resultMap>
+
+    <sql id="selectGbStorageConfigVo">
+        select id, site_id, name, code, storage_type, storage_purpose, 
+               github_token, github_owner, github_repo, github_branch, github_path_prefix, 
+               r2_account_id, r2_access_key, r2_secret_key, r2_bucket, r2_public_url,
+               oss_endpoint, oss_access_key, oss_secret_key, oss_bucket, oss_region,
+               base_path, custom_domain, max_file_size, allowed_extensions, 
+               is_default, priority, status, del_flag, description,
+               create_by, create_time, update_by, update_time 
+        from gb_storage_configs
+    </sql>
+
+    <select id="selectGbStorageConfigList" parameterType="GbStorageConfig" resultMap="GbStorageConfigResult">
+        <!-- 关联模式：查询网站可见的存储配置 -->
+        <if test="queryMode != null and queryMode == 'related' and siteId != null">
+            select s.id, s.site_id, s.name, s.code, s.storage_type, s.storage_purpose,
+                   s.github_token, s.github_owner, s.github_repo, s.github_branch, s.github_path_prefix,
+                   s.r2_account_id, s.r2_access_key, s.r2_secret_key, s.r2_bucket, s.r2_public_url,
+                   s.oss_endpoint, s.oss_access_key, s.oss_secret_key, s.oss_bucket, s.oss_region,
+                   s.base_path, s.custom_domain, s.max_file_size, s.allowed_extensions,
+                   s.is_default, s.priority, s.status, s.del_flag, s.description,
+                   s.create_by, s.create_time, s.update_by, s.update_time,
+                   c.id as category_id,
+                   c.name as category_name,
+                   c.icon as category_icon,
+                   -- 统一的可见性状态：
+                   -- 1. 自有配置（site_id = 当前网站）：优先使用关联表的is_visible（如果存在），否则使用配置本身的status
+                   -- 2. 用户默认站点（site_id = personalSiteId）：
+                   --    - 如果有关联记录（incl.id不为空），使用关联表的is_visible（忽略排除逻辑）
+                   --    - 如果没有关联记录，使用排除逻辑（有excl记录则不可见，否则可见）
+                   -- 3. 其他网站配置：使用关联表的is_visible（必须有关联记录才能访问）
+                   CASE 
+                       WHEN s.site_id = #{siteId} THEN IFNULL(incl.is_visible, s.status)
+                       WHEN s.site_id = #{params.personalSiteId} THEN 
+                           (CASE 
+                               WHEN incl.id IS NOT NULL THEN incl.is_visible
+                               WHEN excl.id IS NULL THEN '1' 
+                               ELSE '0' 
+                           END)
+                       ELSE IFNULL(incl.is_visible, '0')
+                   END as is_visible,
+                   -- 关联来源标识：own(自己的) | default(默认配置) | shared(其他网站分享)
+                   CASE 
+                       WHEN s.site_id = #{siteId} THEN 'own'
+                       WHEN s.site_id = #{params.personalSiteId} THEN 'default'
+                       ELSE 'shared'
+                   END as relation_source,
+                   -- 是否被排除（仅对默认配置且无关联记录时有效）
+                   CASE WHEN s.site_id = #{params.personalSiteId} AND incl.id IS NULL AND excl.id IS NOT NULL THEN 1 ELSE 0 END as is_excluded,
+                   (select count(*) from gb_site_storage_config_relations r2 where r2.storage_config_id = s.id AND r2.relation_type = 'include') as related_sites_count,
+                   (select count(*) from gb_site_storage_config_relations r3 where r3.storage_config_id = s.id AND r3.relation_type = 'exclude') as excluded_sites_count
+            from gb_storage_configs s
+            left join gb_categories c on s.category_id = c.id and c.del_flag = '0'
+            -- 左连接正向关联（include）
+            LEFT JOIN gb_site_storage_config_relations incl 
+                ON s.id = incl.storage_config_id 
+                AND incl.site_id = #{siteId} 
+                AND incl.relation_type = 'include'
+            -- 左连接排除关联（exclude）
+            LEFT JOIN gb_site_storage_config_relations excl 
+                ON s.id = excl.storage_config_id 
+                AND excl.site_id = #{siteId} 
+                AND excl.relation_type = 'exclude'
+            <where>
+                s.del_flag = '0'
+                <!-- 三种配置来源：
+                     1. own: 网站自己创建的配置 (site_id = 当前网站)
+                     2. default: 用户默认站点配置 (site_id = personalSiteId)
+                     3. shared: 其他网站的配置 (通过include关联)
+                -->
+                AND (
+                    s.site_id = #{siteId}
+                    <if test="params != null and params.personalSiteId != null">
+                        OR s.site_id = #{params.personalSiteId}
+                    </if>
+                    OR (s.site_id != #{siteId}
+                        <if test="params != null and params.personalSiteId != null">
+                            AND s.site_id != #{params.personalSiteId}
+                        </if>
+                        AND incl.id IS NOT NULL)
+                )
+                <if test="name != null  and name != ''"> and s.name like concat('%', #{name}, '%')</if>
+                <if test="storageType != null  and storageType != ''"> and s.storage_type = #{storageType}</if>
+                <if test="categoryId != null "> and s.category_id = #{categoryId}</if>
+                <if test="isDefault != null  and isDefault != ''"> and s.is_default = #{isDefault}</if>
+                <if test="status != null  and status != ''"> and s.status = #{status}</if>
+            </where>
+            order by s.priority asc, s.create_time desc
+        </if>
+        <!-- 创建者模式：查询指定创建者的存储配置（默认模式） -->
+        <if test="queryMode == null or queryMode == 'creator'">
+            select s.*, 
+                   c.id as category_id,
+                   c.name as category_name,
+                   c.icon as category_icon,
+                   (select count(*) from gb_site_storage_config_relations r where r.storage_config_id = s.id AND r.relation_type = 'include') as related_sites_count,
+                   (select count(*) from gb_site_storage_config_relations r where r.storage_config_id = s.id AND r.relation_type = 'exclude') as excluded_sites_count
+            from gb_storage_configs s
+            left join gb_categories c on s.category_id = c.id and c.del_flag = '0'
+            <where>
+                s.del_flag = '0'
+                <choose>
+                    <!-- 包含默认配置：查询指定网站创建的 + 默认配置 -->
+                    <when test="siteId != null and includeDefault != null and includeDefault == true and siteId > 0">
+                        and (s.site_id = #{siteId}<if test="params != null and params.personalSiteId != null"> OR s.site_id = #{params.personalSiteId}</if>)
+                    </when>
+                    <!-- 明确指定网站ID -->
+                    <when test="siteId != null and siteId > 0">
+                        and s.site_id = #{siteId}
+                    </when>
+                    <!-- siteId为null时，用personalSiteId兜底，否则返回空 -->
+                    <when test="params != null and params.personalSiteId != null">
+                        and s.site_id = #{params.personalSiteId}
+                    </when>
+                    <otherwise>
+                        and 1 = 0
+                    </otherwise>
+                </choose>
+                <if test="name != null  and name != ''"> and s.name like concat('%', #{name}, '%')</if>
+                <if test="storageType != null  and storageType != ''"> and s.storage_type = #{storageType}</if>
+                <if test="categoryId != null "> and s.category_id = #{categoryId}</if>
+                <if test="isDefault != null  and isDefault != ''"> and s.is_default = #{isDefault}</if>
+                <if test="status != null  and status != ''"> and s.status = #{status}</if>
+            </where>
+            order by s.priority asc, s.create_time desc
+        </if>
+    </select>
+    
+    <select id="selectGbStorageConfigById" parameterType="Long" resultMap="GbStorageConfigResult">
+        select s.*, 
+               c.id as category_id,
+               c.name as category_name,
+               c.icon as category_icon
+        from gb_storage_configs s
+        left join gb_categories c on s.category_id = c.id and c.del_flag = '0'
+        where s.id = #{id} and s.del_flag = '0'
+    </select>
+        
+    <insert id="insertGbStorageConfig" parameterType="GbStorageConfig" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_storage_configs
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">site_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="code != null and code != ''">code,</if>
+            <if test="storageType != null">storage_type,</if>
+            <if test="storagePurpose != null">storage_purpose,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="githubToken != null">github_token,</if>
+            <if test="githubOwner != null">github_owner,</if>
+            <if test="githubRepo != null">github_repo,</if>
+            <if test="githubBranch != null">github_branch,</if>
+            <if test="githubPathPrefix != null">github_path_prefix,</if>
+            <if test="r2AccountId != null">r2_account_id,</if>
+            <if test="r2AccessKey != null">r2_access_key,</if>
+            <if test="r2SecretKey != null">r2_secret_key,</if>
+            <if test="r2Bucket != null">r2_bucket,</if>
+            <if test="r2PublicUrl != null">r2_public_url,</if>
+            <if test="ossEndpoint != null">oss_endpoint,</if>
+            <if test="ossAccessKey != null">oss_access_key,</if>
+            <if test="ossSecretKey != null">oss_secret_key,</if>
+            <if test="ossBucket != null">oss_bucket,</if>
+            <if test="ossRegion != null">oss_region,</if>
+            <if test="basePath != null">base_path,</if>
+            <if test="customDomain != null">custom_domain,</if>
+            <if test="maxFileSize != null">max_file_size,</if>
+            <if test="allowedExtensions != null">allowed_extensions,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="priority != null">priority,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="description != null">description,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">#{siteId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="code != null and code != ''">#{code},</if>
+            <if test="storageType != null">#{storageType},</if>
+            <if test="storagePurpose != null">#{storagePurpose},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="githubToken != null">#{githubToken},</if>
+            <if test="githubOwner != null">#{githubOwner},</if>
+            <if test="githubRepo != null">#{githubRepo},</if>
+            <if test="githubBranch != null">#{githubBranch},</if>
+            <if test="githubPathPrefix != null">#{githubPathPrefix},</if>
+            <if test="r2AccountId != null">#{r2AccountId},</if>
+            <if test="r2AccessKey != null">#{r2AccessKey},</if>
+            <if test="r2SecretKey != null">#{r2SecretKey},</if>
+            <if test="r2Bucket != null">#{r2Bucket},</if>
+            <if test="r2PublicUrl != null">#{r2PublicUrl},</if>
+            <if test="ossEndpoint != null">#{ossEndpoint},</if>
+            <if test="ossAccessKey != null">#{ossAccessKey},</if>
+            <if test="ossSecretKey != null">#{ossSecretKey},</if>
+            <if test="ossBucket != null">#{ossBucket},</if>
+            <if test="ossRegion != null">#{ossRegion},</if>
+            <if test="basePath != null">#{basePath},</if>
+            <if test="customDomain != null">#{customDomain},</if>
+            <if test="maxFileSize != null">#{maxFileSize},</if>
+            <if test="allowedExtensions != null">#{allowedExtensions},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="priority != null">#{priority},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="description != null">#{description},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbStorageConfig" parameterType="GbStorageConfig">
+        update gb_storage_configs
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="code != null and code != ''">code = #{code},</if>
+            <if test="storageType != null">storage_type = #{storageType},</if>
+            <if test="storagePurpose != null">storage_purpose = #{storagePurpose},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="githubToken != null">github_token = #{githubToken},</if>
+            <if test="githubOwner != null">github_owner = #{githubOwner},</if>
+            <if test="githubRepo != null">github_repo = #{githubRepo},</if>
+            <if test="githubBranch != null">github_branch = #{githubBranch},</if>
+            <if test="githubPathPrefix != null">github_path_prefix = #{githubPathPrefix},</if>
+            <if test="r2AccountId != null">r2_account_id = #{r2AccountId},</if>
+            <if test="r2AccessKey != null">r2_access_key = #{r2AccessKey},</if>
+            <if test="r2SecretKey != null">r2_secret_key = #{r2SecretKey},</if>
+            <if test="r2Bucket != null">r2_bucket = #{r2Bucket},</if>
+            <if test="r2PublicUrl != null">r2_public_url = #{r2PublicUrl},</if>
+            <if test="ossEndpoint != null">oss_endpoint = #{ossEndpoint},</if>
+            <if test="ossAccessKey != null">oss_access_key = #{ossAccessKey},</if>
+            <if test="ossSecretKey != null">oss_secret_key = #{ossSecretKey},</if>
+            <if test="ossBucket != null">oss_bucket = #{ossBucket},</if>
+            <if test="ossRegion != null">oss_region = #{ossRegion},</if>
+            <if test="basePath != null">base_path = #{basePath},</if>
+            <if test="customDomain != null">custom_domain = #{customDomain},</if>
+            <if test="maxFileSize != null">max_file_size = #{maxFileSize},</if>
+            <if test="allowedExtensions != null">allowed_extensions = #{allowedExtensions},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="priority != null">priority = #{priority},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteGbStorageConfigById" parameterType="Long">
+        update gb_storage_configs set del_flag = '2' where id = #{id}
+    </update>
+
+    <update id="deleteGbStorageConfigByIds" parameterType="String">
+        update gb_storage_configs set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

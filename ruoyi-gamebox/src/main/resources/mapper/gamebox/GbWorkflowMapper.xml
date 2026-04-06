@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbWorkflowMapper">
+    
+    <resultMap type="GbWorkflow" id="GbWorkflowResult">
+        <result property="id"              column="id"              />
+        <result property="workflowCode"    column="workflow_code"   />
+        <result property="workflowName"    column="workflow_name"   />
+        <result property="description"     column="description"     />
+        <result property="definition"      column="definition"      />
+        <result property="triggerType"         column="trigger_type"         />
+        <result property="scheduleExpression"   column="schedule_expression"  />
+        <result property="stepCount"            column="step_count"           />
+        <result property="enabled"         column="enabled"         />
+        <result property="siteId"          column="site_id"         />
+        <result property="categoryId"      column="category_id"     />
+        <result property="createBy"        column="create_by"       />
+        <result property="createTime"      column="create_time"     />
+        <result property="updateBy"        column="update_by"       />
+        <result property="updateTime"      column="update_time"     />
+        <result property="categoryName"    column="category_name"   />
+        <result property="categoryIcon"    column="category_icon"   />
+        <result property="siteName"        column="site_name"       />
+        <result property="relationSource"  column="relation_source" />
+        <result property="isExcluded"      column="is_excluded"     />
+        <result property="isVisible"       column="is_visible"      />
+        <result property="relatedSitesCount" column="related_sites_count" />
+    </resultMap>
+
+    <resultMap id="WorkflowSiteRelationResult" type="java.util.HashMap">
+        <result column="site_id" property="siteId"/>
+        <result column="site_name" property="siteName"/>
+        <result column="relation_type" property="relationType"/>
+        <result column="is_visible" property="isVisible"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="selectGbWorkflowVo">
+        select 
+            w.id, w.workflow_code, w.workflow_name, w.description, w.definition, 
+            w.trigger_type, w.schedule_expression, w.step_count, w.enabled, w.site_id, w.category_id,
+            w.create_by, w.create_time, w.update_by, w.update_time,
+            c.name as category_name, c.icon as category_icon,
+            s.name as site_name
+        from gb_workflow w
+        left join gb_categories c on w.category_id = c.id
+        left join gb_sites s on w.site_id = s.id
+    </sql>
+
+    <select id="selectGbWorkflowList" parameterType="GbWorkflow" resultMap="GbWorkflowResult">
+        <choose>
+            <!-- 创建者模式：查询自己创建的 + 默认配置 -->
+            <when test="queryMode == 'creator'">
+                SELECT 
+                    w.*,
+                    c.name as category_name, c.icon as category_icon,
+                    s.name as site_name,
+                    <if test="siteId != null">
+                    CASE 
+                        WHEN w.site_id = #{params.personalSiteId} THEN 'default'
+                        ELSE 'own'
+                    END as relation_source,
+                    CASE WHEN excl.id IS NOT NULL THEN 1 ELSE 0 END as is_excluded,
+                    </if>
+                    (SELECT COUNT(*) FROM gb_site_workflow_relation swr 
+                     WHERE swr.workflow_id = w.id AND swr.relation_type = 'include') as related_sites_count
+                FROM gb_workflow w
+                LEFT JOIN gb_categories c ON w.category_id = c.id
+                LEFT JOIN gb_sites s ON w.site_id = s.id
+                <if test="siteId != null">
+                LEFT JOIN gb_site_workflow_relation excl 
+                    ON w.id = excl.workflow_id 
+                    AND excl.site_id = #{siteId} 
+                    AND excl.relation_type = 'exclude'
+                </if>
+                <where>
+                    <choose>
+                        <when test="siteId != null and includeDefault != null and includeDefault and siteId > 0">
+                        (w.site_id = #{siteId}<if test="params != null and params.personalSiteId != null"> OR w.site_id = #{params.personalSiteId}</if>)
+                        </when>
+                        <when test="siteId != null and siteId > 0">
+                        w.site_id = #{siteId}
+                        </when>
+                        <!-- siteId为null时，用personalSiteId兜底，否则返回空 -->
+                        <when test="params != null and params.personalSiteId != null">
+                        w.site_id = #{params.personalSiteId}
+                        </when>
+                        <otherwise>
+                        1 = 0
+                        </otherwise>
+                    </choose>
+                    <if test="workflowCode != null and workflowCode != ''">
+                        AND w.workflow_code like concat('%', #{workflowCode}, '%')
+                    </if>
+                    <if test="workflowName != null and workflowName != ''">
+                        AND w.workflow_name like concat('%', #{workflowName}, '%')
+                    </if>
+                    <if test="triggerType != null and triggerType != ''">
+                        AND w.trigger_type = #{triggerType}
+                    </if>
+                    <if test="categoryId != null">
+                        AND w.category_id = #{categoryId}
+                    </if>
+                    <if test="enabled != null">
+                        AND w.enabled = #{enabled}
+                    </if>
+                </where>
+                <choose>
+                    <when test="siteId != null">
+                    ORDER BY w.site_id DESC, w.create_time DESC
+                    </when>
+                    <otherwise>
+                    ORDER BY w.create_time DESC
+                    </otherwise>
+                </choose>
+            </when>
+            
+            <!-- 关联模式：查询关联到该网站的工作流 -->
+            <when test="queryMode == 'related'">
+                SELECT 
+                    w.*,
+                    c.name as category_name, c.icon as category_icon,
+                    s.name as site_name,
+                    -- 统一的可见性状态：
+                    -- 1. 自有工作流（site_id = 当前网站）：使用工作流本身的enabled
+                    -- 2. 用户默认站点（site_id = personalSiteId）：
+                    --    - 如果有关联记录（rel.id不为空），使用关联表的is_visible（忽略排除逻辑）
+                    --    - 如果没有关联记录，使用排除逻辑（有excl记录则不可见，否则可见）
+                    -- 3. 其他网站工作流：使用关联表的is_visible
+                    CASE 
+                        WHEN w.site_id = #{siteId} THEN w.enabled
+                        WHEN w.site_id = #{params.personalSiteId} THEN 
+                            (CASE 
+                                WHEN rel.id IS NOT NULL THEN rel.is_visible
+                                WHEN excl.id IS NULL THEN '1' 
+                                ELSE '0' 
+                            END)
+                        ELSE rel.is_visible
+                    END as is_visible,
+                    -- 关联来源标识
+                    CASE 
+                        WHEN w.site_id = #{siteId} THEN 'own'
+                        WHEN w.site_id = #{params.personalSiteId} THEN 'default'
+                        ELSE 'shared'
+                    END as relation_source,
+                    -- 是否被排除（仅对默认配置且无关联记录时有效）
+                    CASE WHEN w.site_id = #{params.personalSiteId} AND rel.id IS NULL AND excl.id IS NOT NULL THEN 1 ELSE 0 END as is_excluded
+                FROM gb_workflow w
+                LEFT JOIN gb_categories c ON w.category_id = c.id
+                LEFT JOIN gb_sites s ON w.site_id = s.id
+                LEFT JOIN gb_site_workflow_relation excl 
+                    ON w.id = excl.workflow_id 
+                    AND excl.site_id = #{siteId} 
+                    AND excl.relation_type = 'exclude'
+                LEFT JOIN gb_site_workflow_relation rel
+                    ON w.id = rel.workflow_id
+                    AND rel.site_id = #{siteId}
+                    AND rel.relation_type = 'include'
+                WHERE (
+                    w.site_id = #{siteId} 
+                    <if test="params != null and params.personalSiteId != null">
+                        OR w.site_id = #{params.personalSiteId}
+                    </if>
+                    OR rel.id IS NOT NULL
+                )
+                <if test="workflowCode != null and workflowCode != ''">
+                    AND w.workflow_code like concat('%', #{workflowCode}, '%')
+                </if>
+                <if test="workflowName != null and workflowName != ''">
+                    AND w.workflow_name like concat('%', #{workflowName}, '%')
+                </if>
+                <if test="triggerType != null and triggerType != ''">
+                    AND w.trigger_type = #{triggerType}
+                </if>
+                <if test="categoryId != null">
+                    AND w.category_id = #{categoryId}
+                </if>
+                <if test="enabled != null">
+                    AND w.enabled = #{enabled}
+                </if>
+                ORDER BY relation_source DESC, w.create_time DESC
+            </when>
+            
+            <!-- 默认查询 -->
+            <otherwise>
+                <include refid="selectGbWorkflowVo"/>
+                <where>  
+                    <if test="workflowCode != null and workflowCode != ''">
+                        AND w.workflow_code like concat('%', #{workflowCode}, '%')
+                    </if>
+                    <if test="workflowName != null and workflowName != ''">
+                        AND w.workflow_name like concat('%', #{workflowName}, '%')
+                    </if>
+                    <if test="triggerType != null and triggerType != ''">
+                        AND w.trigger_type = #{triggerType}
+                    </if>
+                    <if test="enabled != null">
+                        AND w.enabled = #{enabled}
+                    </if>
+                    <if test="siteId != null">
+                        AND w.site_id = #{siteId}
+                    </if>
+                    <if test="categoryId != null">
+                        AND w.category_id = #{categoryId}
+                    </if>
+                </where>
+                order by w.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+    
+    <select id="selectGbWorkflowById" parameterType="Long" resultMap="GbWorkflowResult">
+        <include refid="selectGbWorkflowVo"/>
+        where w.id = #{id}
+    </select>
+
+    <select id="selectGbWorkflowByCode" parameterType="String" resultMap="GbWorkflowResult">
+        <include refid="selectGbWorkflowVo"/>
+        where w.workflow_code = #{workflowCode}
+        limit 1
+    </select>
+        
+    <insert id="insertGbWorkflow" parameterType="GbWorkflow" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_workflow
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="workflowCode != null and workflowCode != ''">workflow_code,</if>
+            <if test="workflowName != null and workflowName != ''">workflow_name,</if>
+            <if test="description != null">description,</if>
+            <if test="definition != null and definition != ''">definition,</if>
+            <if test="triggerType != null and triggerType != ''">trigger_type,</if>
+            <if test="scheduleExpression != null">schedule_expression,</if>
+            <if test="stepCount != null">step_count,</if>
+            <if test="enabled != null">enabled,</if>
+            <if test="siteId != null">site_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="workflowCode != null and workflowCode != ''">#{workflowCode},</if>
+            <if test="workflowName != null and workflowName != ''">#{workflowName},</if>
+            <if test="description != null">#{description},</if>
+            <if test="definition != null and definition != ''">#{definition},</if>
+            <if test="triggerType != null and triggerType != ''">#{triggerType},</if>
+            <if test="scheduleExpression != null">#{scheduleExpression},</if>
+            <if test="stepCount != null">#{stepCount},</if>
+            <if test="enabled != null">#{enabled},</if>
+            <if test="siteId != null">#{siteId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbWorkflow" parameterType="GbWorkflow">
+        update gb_workflow
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workflowCode != null and workflowCode != ''">workflow_code = #{workflowCode},</if>
+            <if test="workflowName != null and workflowName != ''">workflow_name = #{workflowName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="definition != null and definition != ''">definition = #{definition},</if>
+            <if test="triggerType != null and triggerType != ''">trigger_type = #{triggerType},</if>
+            <if test="scheduleExpression != null">schedule_expression = #{scheduleExpression},</if>
+            <if test="stepCount != null">step_count = #{stepCount},</if>
+            <if test="enabled != null">enabled = #{enabled},</if>
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteGbWorkflowById" parameterType="Long">
+        delete from gb_workflow where id = #{id}
+    </delete>
+
+    <delete id="deleteGbWorkflowByIds" parameterType="Long">
+        delete from gb_workflow where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- 获取工作流关联的网站列表 -->
+    <select id="getWorkflowSites" resultMap="WorkflowSiteRelationResult">
+        SELECT 
+            r.site_id,
+            s.name as site_name,
+            r.relation_type,
+            r.is_visible,
+            r.create_time
+        FROM gb_site_workflow_relation r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        WHERE r.workflow_id = #{workflowId}
+        ORDER BY r.create_time DESC
+    </select>
+
+    <!-- 更新网站工作流关联关系 -->
+    <insert id="updateSiteWorkflowRelation">
+        INSERT INTO gb_site_workflow_relation (site_id, workflow_id, relation_type, create_time)
+        VALUES (#{siteId}, #{workflowId}, #{relationType}, NOW())
+        ON DUPLICATE KEY UPDATE relation_type = #{relationType}, update_time = NOW()
+    </insert>
+
+    <!-- 删除网站工作流关联关系（支持指定类型删除） -->
+    <delete id="deleteSiteWorkflowRelation">
+        DELETE FROM gb_site_workflow_relation
+        WHERE site_id = #{siteId} AND workflow_id = #{workflowId}
+        <if test="relationType != null and relationType != ''">
+            AND relation_type = #{relationType}
+        </if>
+    </delete>
+
+    <!-- 批量删除工作流关联关系 -->
+    <delete id="deleteWorkflowRelations">
+        DELETE FROM gb_site_workflow_relation WHERE workflow_id = #{workflowId}
+    </delete>
+
+    <!-- 批量插入工作流关联关系 -->
+    <insert id="batchInsertWorkflowRelations">
+        INSERT INTO gb_site_workflow_relation (site_id, workflow_id, relation_type, create_time)
+        VALUES
+        <foreach collection="siteIds" item="siteId" separator=",">
+            (#{siteId}, #{workflowId}, #{relationType}, NOW())
+        </foreach>
+    </insert>
+
+    <!-- 切换关联可见性 -->
+    <update id="toggleWorkflowVisibility">
+        UPDATE gb_site_workflow_relation
+        SET is_visible = #{isVisible}, update_time = NOW()
+        WHERE site_id = #{siteId} AND workflow_id = #{workflowId} AND relation_type = 'include'
+    </update>
+
+    <!-- 删除工作流的所有排除关系 -->
+    <delete id="deleteWorkflowExclusions">
+        DELETE FROM gb_site_workflow_relation 
+        WHERE workflow_id = #{workflowId} AND relation_type = 'exclude'
+    </delete>
+
+    <!-- 批量插入工作流排除关系 -->
+    <insert id="batchInsertWorkflowExclusions">
+        INSERT INTO gb_site_workflow_relation (site_id, workflow_id, relation_type, is_visible, create_time)
+        VALUES
+        <foreach collection="excludedSiteIds" item="siteId" separator=",">
+            (#{siteId}, #{workflowId}, 'exclude', '0', NOW())
+        </foreach>
+    </insert>
+
+    <!-- 获取工作流已排除的网站列表 -->
+    <select id="getExcludedSitesByWorkflow" resultType="Long">
+        SELECT site_id
+        FROM gb_site_workflow_relation
+        WHERE workflow_id = #{workflowId} AND relation_type = 'exclude'
+    </select>
+</mapper>

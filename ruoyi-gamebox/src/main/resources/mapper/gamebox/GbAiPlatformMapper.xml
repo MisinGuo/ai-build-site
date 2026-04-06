@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbAiPlatformMapper">
+    
+    <resultMap type="GbAiPlatform" id="GbAiPlatformResult">
+        <result property="id"                   column="id"                    />
+        <result property="siteId"               column="site_id"               />
+        <result property="name"                 column="name"                  />
+        <result property="platformType"         column="platform_type"         />
+        <result property="baseUrl"              column="api_endpoint"          />
+        <result property="apiKey"               column="api_key"               />
+        <result property="organizationId"       column="api_secret"            />
+        <result property="defaultModel"         column="model_name"            />
+        <result property="availableModels"      column="available_models"      />
+        <result property="categoryId"           column="category_id"           />
+        <result property="proxyConfig"          column="config"                />
+        <result property="maxTokens"            column="max_tokens"            />
+        <result property="temperature"          column="temperature"           />
+        <result property="rateLimitPerMinute"   column="rate_limit"            />
+        <result property="costPer1kTokens"      column="cost_per_1k_tokens"    />
+        <result property="isDefault"            column="is_default"            />
+        <result property="status"               column="status"                />
+        <result property="delFlag"              column="del_flag"              />
+        <result property="relatedSitesCount"    column="related_sites_count"   />
+        <result property="excludedSitesCount"   column="excluded_sites_count"  />
+        <result property="isVisible"            column="is_visible"            />
+        <result property="isExcluded"           column="is_excluded"           />
+        <result property="relationSource"       column="relation_source"       />
+        <result property="categoryName"         column="category_name"         />
+        <result property="categoryIcon"         column="category_icon"         />
+        <result property="createBy"             column="create_by"             />
+        <result property="createTime"           column="create_time"           />
+        <result property="updateBy"             column="update_by"             />
+        <result property="updateTime"           column="update_time"           />
+        <result property="remark"               column="remark"                />
+    </resultMap>
+
+    <sql id="selectGbAiPlatformVo">
+        select id, site_id, name, platform_type, api_endpoint, api_key, api_secret, model_name, available_models, category_id, config, max_tokens, temperature, rate_limit, cost_per_1k_tokens, is_default, status, del_flag, create_by, create_time, update_by, update_time, remark from gb_ai_platforms
+    </sql>
+
+    <select id="selectGbAiPlatformList" parameterType="GbAiPlatform" resultMap="GbAiPlatformResult">
+        <!-- 关联模式：查询网站可见的AI平台配置 -->
+        <if test="queryMode != null and queryMode == 'related' and siteId != null">
+            select p.id, p.site_id, p.name, p.platform_type, p.api_endpoint, p.api_key, p.api_secret,
+                   p.model_name, p.available_models, p.category_id, p.config, p.max_tokens, p.temperature,
+                   p.rate_limit, p.cost_per_1k_tokens, p.is_default, p.status, p.del_flag,
+                   p.create_by, p.create_time, p.update_by, p.update_time, p.remark,
+                   c.name as category_name,
+                   c.icon as category_icon,
+                   -- 统一的可见性状态：
+                   -- 1. 自有配置（site_id = 当前网站）：优先使用关联表的is_visible（如果存在），否则使用配置本身的status
+                   -- 2. 用户默认站点（site_id = personalSiteId）：
+                   --    - 如果有关联记录（incl.id不为空），使用关联表的is_visible（忽略排除逻辑）
+                   --    - 如果没有关联记录，使用排除逻辑（有excl记录则不可见，否则可见）
+                   -- 3. 其他网站配置：使用关联表的is_visible（必须有关联记录才能访问）
+                   CASE 
+                       WHEN p.site_id = #{siteId} THEN IFNULL(incl.is_visible, p.status)
+                       WHEN p.site_id = #{params.personalSiteId} THEN 
+                           (CASE 
+                               WHEN incl.id IS NOT NULL THEN incl.is_visible
+                               WHEN excl.id IS NULL THEN '1' 
+                               ELSE '0' 
+                           END)
+                       ELSE IFNULL(incl.is_visible, '0')
+                   END as is_visible,
+                   -- 关联来源标识：own(自己的) | default(默认配置) | shared(其他网站分享)
+                   CASE 
+                       WHEN p.site_id = #{siteId} THEN 'own'
+                       WHEN p.site_id = #{params.personalSiteId} THEN 'default'
+                       ELSE 'shared'
+                   END as relation_source,
+                   -- 是否被排除（仅对默认配置且无关联记录时有效）
+                   CASE WHEN p.site_id = #{params.personalSiteId} AND incl.id IS NULL AND excl.id IS NOT NULL THEN 1 ELSE 0 END as is_excluded,
+                   (select count(*) from gb_site_ai_platform_relations r2 where r2.ai_platform_id = p.id AND r2.relation_type = 'include') as related_sites_count,
+                   (select count(*) from gb_site_ai_platform_relations r3 where r3.ai_platform_id = p.id AND r3.relation_type = 'exclude') as excluded_sites_count
+            from gb_ai_platforms p
+            left join gb_categories c on p.category_id = c.id and c.del_flag = '0'
+            -- 左连接正向关联（include）
+            LEFT JOIN gb_site_ai_platform_relations incl 
+                ON p.id = incl.ai_platform_id 
+                AND incl.site_id = #{siteId} 
+                AND incl.relation_type = 'include'
+            -- 左连接排除关联（exclude）
+            LEFT JOIN gb_site_ai_platform_relations excl 
+                ON p.id = excl.ai_platform_id 
+                AND excl.site_id = #{siteId} 
+                AND excl.relation_type = 'exclude'
+            <where>
+                p.del_flag = '0'
+                <!-- 三种配置来源：
+                     1. own: 网站自己创建的配置 (site_id = 当前网站)
+                     2. default: 用户默认站点配置 (site_id = personalSiteId)
+                     3. shared: 其他网站的配置 (通过include关联)
+                -->
+                AND (
+                    p.site_id = #{siteId}
+                    <if test="params != null and params.personalSiteId != null">
+                        OR p.site_id = #{params.personalSiteId}
+                    </if>
+                    OR (p.site_id != #{siteId}
+                        <if test="params != null and params.personalSiteId != null">
+                            AND p.site_id != #{params.personalSiteId}
+                        </if>
+                        AND incl.id IS NOT NULL)
+                )
+                <if test="categoryId != null">and p.category_id = #{categoryId}</if>
+                <if test="name != null  and name != ''"> and p.name like concat('%', #{name}, '%')</if>
+                <if test="platformType != null  and platformType != ''"> and p.platform_type = #{platformType}</if>
+                <if test="isDefault != null  and isDefault != ''"> and p.is_default = #{isDefault}</if>
+                <if test="status != null  and status != ''"> and p.status = #{status}</if>
+            </where>
+            order by p.is_default desc, p.create_time desc
+        </if>
+        
+        <!-- 创建者模式：查询指定创建者的AI平台配置（默认模式） -->
+        <if test="queryMode == null or queryMode == 'creator'">
+            select p.*, 
+                   c.name as category_name,
+                   c.icon as category_icon,
+                   (select count(*) from gb_site_ai_platform_relations r where r.ai_platform_id = p.id AND r.relation_type = 'include') as related_sites_count,
+                   (select count(*) from gb_site_ai_platform_relations r where r.ai_platform_id = p.id AND r.relation_type = 'exclude') as excluded_sites_count
+            from gb_ai_platforms p
+            left join gb_categories c on p.category_id = c.id and c.del_flag = '0'
+            <where>
+                p.del_flag = '0'
+                <choose>
+                    <!-- 包含默认配置：查询指定网站创建的 + 默认配置 -->
+                    <when test="siteId != null and includeDefault != null and includeDefault == true and siteId > 0">
+                        and (p.site_id = #{siteId}<if test="params != null and params.personalSiteId != null"> OR p.site_id = #{params.personalSiteId}</if>)
+                    </when>
+                    <!-- 明确指定网站ID -->
+                    <when test="siteId != null and siteId > 0">
+                        and p.site_id = #{siteId}
+                    </when>
+                    <!-- siteId为null时，用personalSiteId兜底，否则返回空 -->
+                    <when test="params != null and params.personalSiteId != null">
+                        and p.site_id = #{params.personalSiteId}
+                    </when>
+                    <otherwise>
+                        and 1 = 0
+                    </otherwise>
+                </choose>
+                <if test="categoryId != null">and p.category_id = #{categoryId}</if>
+                <if test="name != null  and name != ''"> and p.name like concat('%', #{name}, '%')</if>
+                <if test="platformType != null  and platformType != ''"> and p.platform_type = #{platformType}</if>
+                <if test="isDefault != null  and isDefault != ''"> and p.is_default = #{isDefault}</if>
+                <if test="status != null  and status != ''"> and p.status = #{status}</if>
+            </where>
+            order by p.is_default desc, p.create_time desc
+        </if>
+    </select>
+    
+    <select id="selectGbAiPlatformById" parameterType="Long" resultMap="GbAiPlatformResult">
+        <include refid="selectGbAiPlatformVo"/>
+        where id = #{id} and del_flag = '0'
+    </select>
+        
+    <insert id="insertGbAiPlatform" parameterType="GbAiPlatform" useGeneratedKeys="true" keyProperty="id">
+        insert into gb_ai_platforms
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">site_id,</if>
+            <if test="name != null and name != ''">name,</if>
+            <if test="platformType != null">platform_type,</if>
+            <if test="baseUrl != null">api_endpoint,</if>
+            <if test="apiKey != null">api_key,</if>
+            <if test="organizationId != null">api_secret,</if>
+            <if test="defaultModel != null">model_name,</if>
+            <if test="availableModels != null">available_models,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="proxyConfig != null">config,</if>
+            <if test="maxTokens != null">max_tokens,</if>
+            <if test="temperature != null">temperature,</if>
+            <if test="rateLimitPerMinute != null">rate_limit,</if>
+            <if test="costPer1kTokens != null">cost_per_1k_tokens,</if>
+            <if test="isDefault != null">is_default,</if>
+            <if test="status != null">status,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="siteId != null">#{siteId},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="platformType != null">#{platformType},</if>
+            <if test="baseUrl != null">#{baseUrl},</if>
+            <if test="apiKey != null">#{apiKey},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="defaultModel != null">#{defaultModel},</if>
+            <if test="availableModels != null">#{availableModels},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="proxyConfig != null">#{proxyConfig},</if>
+            <if test="maxTokens != null">#{maxTokens},</if>
+            <if test="temperature != null">#{temperature},</if>
+            <if test="rateLimitPerMinute != null">#{rateLimitPerMinute},</if>
+            <if test="costPer1kTokens != null">#{costPer1kTokens},</if>
+            <if test="isDefault != null">#{isDefault},</if>
+            <if test="status != null">#{status},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateGbAiPlatform" parameterType="GbAiPlatform">
+        update gb_ai_platforms
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="siteId != null">site_id = #{siteId},</if>
+            <if test="name != null and name != ''">name = #{name},</if>
+            <if test="platformType != null">platform_type = #{platformType},</if>
+            <if test="baseUrl != null">api_endpoint = #{baseUrl},</if>
+            <if test="apiKey != null">api_key = #{apiKey},</if>
+            <if test="organizationId != null">api_secret = #{organizationId},</if>
+            <if test="defaultModel != null">model_name = #{defaultModel},</if>
+            <if test="availableModels != null">available_models = #{availableModels},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="proxyConfig != null">config = #{proxyConfig},</if>
+            <if test="maxTokens != null">max_tokens = #{maxTokens},</if>
+            <if test="temperature != null">temperature = #{temperature},</if>
+            <if test="rateLimitPerMinute != null">rate_limit = #{rateLimitPerMinute},</if>
+            <if test="costPer1kTokens != null">cost_per_1k_tokens = #{costPer1kTokens},</if>
+            <if test="isDefault != null">is_default = #{isDefault},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="deleteGbAiPlatformById" parameterType="Long">
+        update gb_ai_platforms set del_flag = '2' where id = #{id}
+    </update>
+
+    <update id="deleteGbAiPlatformByIds" parameterType="String">
+        update gb_ai_platforms set del_flag = '2' where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+</mapper>

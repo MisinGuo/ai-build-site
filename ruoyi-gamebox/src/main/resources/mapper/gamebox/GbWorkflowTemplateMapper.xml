@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ruoyi.gamebox.mapper.GbWorkflowTemplateMapper">
+
+    <resultMap id="BaseResultMap" type="com.ruoyi.gamebox.domain.GbWorkflowTemplate">
+        <id     column="id"            property="id" />
+        <result column="template_code" property="templateCode" />
+        <result column="template_name" property="templateName" />
+        <result column="description"   property="description" />
+        <result column="category"      property="category" />
+        <result column="icon"          property="icon" />
+        <result column="definition"    property="definition" />
+        <result column="usage_count"   property="usageCount" />
+        <result column="is_public"     property="isPublic" />
+        <result column="sort_order"    property="sortOrder" />
+        <result column="create_by"     property="createBy" />
+        <result column="create_time"   property="createTime" />
+        <result column="update_by"     property="updateBy" />
+        <result column="update_time"   property="updateTime" />
+    </resultMap>
+
+    <!-- 查询模板列表（不含 definition，减少传输大小） -->
+    <select id="selectList" resultMap="BaseResultMap" parameterType="com.ruoyi.gamebox.domain.GbWorkflowTemplate">
+        SELECT id, template_code, template_name, description, category, icon,
+               usage_count, is_public, sort_order, create_by, create_time
+        FROM gb_workflow_template
+        <where>
+            <if test="category != null and category != ''">AND category = #{category}</if>
+            <if test="isPublic != null">AND is_public = #{isPublic}</if>
+            <if test="templateName != null and templateName != ''">
+                AND template_name LIKE CONCAT('%', #{templateName}, '%')
+            </if>
+        </where>
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <!-- 根据 ID 查询（含 definition） -->
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT * FROM gb_workflow_template WHERE id = #{id}
+    </select>
+
+    <!-- 根据编码查询（含 definition） -->
+    <select id="selectByCode" resultMap="BaseResultMap">
+        SELECT * FROM gb_workflow_template WHERE template_code = #{templateCode} LIMIT 1
+    </select>
+
+    <!-- 新增模板 -->
+    <insert id="insertTemplate" parameterType="com.ruoyi.gamebox.domain.GbWorkflowTemplate"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO gb_workflow_template
+            (template_code, template_name, description, category, icon, definition,
+             usage_count, is_public, sort_order, create_by, create_time)
+        VALUES
+            (#{templateCode}, #{templateName}, #{description}, #{category}, #{icon}, #{definition},
+             IFNULL(#{usageCount}, 0), IFNULL(#{isPublic}, 1), IFNULL(#{sortOrder}, 0),
+             #{createBy}, NOW())
+    </insert>
+
+    <!-- 更新模板 -->
+    <update id="updateTemplate" parameterType="com.ruoyi.gamebox.domain.GbWorkflowTemplate">
+        UPDATE gb_workflow_template
+        <set>
+            <if test="templateName != null">template_name = #{templateName},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="icon != null">icon = #{icon},</if>
+            <if test="definition != null">definition = #{definition},</if>
+            <if test="isPublic != null">is_public = #{isPublic},</if>
+            <if test="sortOrder != null">sort_order = #{sortOrder},</if>
+            update_by = #{updateBy},
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 删除模板 -->
+    <delete id="deleteById">
+        DELETE FROM gb_workflow_template WHERE id = #{id}
+    </delete>
+
+    <!-- 使用次数 +1 -->
+    <update id="incrementUsageCount">
+        UPDATE gb_workflow_template SET usage_count = usage_count + 1 WHERE id = #{id}
+    </update>
+
+</mapper>

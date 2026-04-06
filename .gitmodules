@@ -1,0 +1,6 @@
+[submodule "Next-web"]
+	path = Next-web
+	url = https://github.com/MisinGuo/game-box-sub-template-game-0.git
+[submodule "Next-web-sub"]
+	path = Next-web-sub
+	url = https://github.com/MisinGuo/game-box-sub-template-0.git

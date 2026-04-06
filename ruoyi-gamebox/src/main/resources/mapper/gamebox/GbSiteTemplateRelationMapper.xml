@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.gamebox.mapper.GbSiteTemplateRelationMapper">
+    
+    <resultMap type="GbSiteTemplateRelation" id="GbSiteTemplateRelationResult">
+        <result property="id"    column="id"    />
+        <result property="siteId"    column="site_id"    />
+        <result property="promptTemplateId"    column="prompt_template_id"    />
+        <result property="relationType"    column="relation_type"    />
+        <result property="isVisible"    column="is_visible"    />
+        <result property="isEditable"    column="is_editable"    />
+        <result property="sortOrder"    column="sort_order"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="siteName"    column="site_name"    />
+        <result property="templateName"    column="template_name"    />
+    </resultMap>
+
+    <!-- 查询网站的所有提示词模板 -->
+    <select id="selectTemplatesBySiteId" resultMap="GbSiteTemplateRelationResult">
+        SELECT 
+            r.id,
+            r.site_id,
+            r.prompt_template_id,
+            r.relation_type,
+            r.is_visible,
+            r.is_editable,
+            r.sort_order,
+            r.create_by,
+            r.create_time,
+            r.update_by,
+            r.update_time,
+            s.name as site_name,
+            t.name as template_name
+        FROM gb_site_template_relations r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        LEFT JOIN gb_prompt_templates t ON r.prompt_template_id = t.id
+        WHERE r.site_id = #{siteId}
+        ORDER BY r.sort_order, r.id
+    </select>
+
+    <!-- 查询提示词模板在哪些网站可用 -->
+    <select id="selectSitesByTemplateId" resultMap="GbSiteTemplateRelationResult">
+        SELECT 
+            r.id,
+            r.site_id,
+            r.prompt_template_id,
+            r.relation_type,
+            r.is_visible,
+            r.is_editable,
+            r.sort_order,
+            r.create_by,
+            r.create_time,
+            r.update_by,
+            r.update_time,
+            s.name as site_name,
+            t.name as template_name
+        FROM gb_site_template_relations r
+        LEFT JOIN gb_sites s ON r.site_id = s.id
+        LEFT JOIN gb_prompt_templates t ON r.prompt_template_id = t.id
+        WHERE r.prompt_template_id = #{promptTemplateId}
+        ORDER BY r.sort_order, r.id
+    </select>
+
+    <!-- 检查关联是否存在 -->
+    <select id="checkRelationExists" resultType="int">
+        SELECT COUNT(1)
+        FROM gb_site_template_relations
+        WHERE site_id = #{siteId} AND prompt_template_id = #{promptTemplateId}
+    </select>
+
+    <!-- 新增关联 -->
+    <insert id="insertGbSiteTemplateRelation" parameterType="GbSiteTemplateRelation">
+        INSERT INTO gb_site_template_relations (
+            site_id,
+            prompt_template_id,
+            relation_type,
+            is_visible,
+            is_editable,
+            sort_order,
+            create_by,
+            create_time
+        ) VALUES (
+            #{siteId},
+            #{promptTemplateId},
+            #{relationType},
+            #{isVisible},
+            #{isEditable},
+            #{sortOrder},
+            #{createBy},
+            #{createTime}
+        )
+    </insert>
+
+    <!-- 批量新增关联 -->
+    <insert id="batchInsertGbSiteTemplateRelation" parameterType="java.util.List">
+        INSERT INTO gb_site_template_relations (
+            site_id,
+            prompt_template_id,
+            relation_type,
+            is_visible,
+            is_editable,
+            sort_order,
+            create_by,
+            create_time
+        ) VALUES
+        <foreach collection="relations" item="item" separator=",">
+            (
+                #{item.siteId},
+                #{item.promptTemplateId},
+                #{item.relationType},
+                #{item.isVisible},
+                #{item.isEditable},
+                #{item.sortOrder},
+                #{item.createBy},
+                #{item.createTime}
+            )
+        </foreach>
+    </insert>
+
+    <!-- 删除关联 -->
+    <delete id="deleteGbSiteTemplateRelation">
+        DELETE FROM gb_site_template_relations
+        WHERE site_id = #{siteId} AND prompt_template_id = #{promptTemplateId}
+    </delete>
+    
+    <!-- 查询默认提示词模板被哪些网站排除 -->
+    <select id="selectExcludedSiteIds" resultType="java.lang.Long">
+        SELECT site_id
+        FROM gb_site_template_relations
+        WHERE prompt_template_id = #{promptTemplateId}
+          AND relation_type = 'exclude'
+        ORDER BY site_id
+    </select>
+    
+    <!-- 批量删除排除关联 -->
+    <delete id="batchDeleteExcludeRelations">
+        DELETE FROM gb_site_template_relations
+        WHERE prompt_template_id = #{promptTemplateId}
+          AND relation_type = 'exclude'
+          AND site_id IN
+          <foreach collection="siteIds" item="siteId" open="(" separator="," close=")">
+              #{siteId}
+          </foreach>
+    </delete>
+
+</mapper>

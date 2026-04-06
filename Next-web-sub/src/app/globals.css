@@ -1,0 +1,9 @@
+@import '../styles/index.css';
+
+/* Article typography tweaks for sticky header anchors */
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  scroll-margin-top: 88px;
+}
